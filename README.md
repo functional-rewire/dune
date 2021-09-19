@@ -1,20 +1,23 @@
 # Dune
 
+[![Hex Version](https://img.shields.io/hexpm/v/dune.svg)](https://hex.pm/packages/dune)
+[![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/dune/)
+
 A sandbox for Elixir to safely evaluate untrusted code from user input.
 
 [**Try it out online!**](https://playground.functional-rewire.com/)
 
-This can be useful to develop playgrounds, online REPL, coding games, or
-customizeable business logic.
+`Dune` can be useful to develop playgrounds, online REPL, coding games, or
+customizable business logic.
 
 **Warning:** `Dune` is still early stage: expect bugs and vulnerabilities. Use
-at your own risk and avoid running it directly on a server with any sensisitive
+at your own risk and avoid running it directly on a server with any sensitive
 access, e.g. to a database.
 
 ## Features
 
 - only authorized modules and functions can be executed (see
-  `Dune.Allowlist.Default`)
+  [`Dune.Allowlist.Default`](https://hexdocs.pm/dune/Dune.Allowlist.Default.html#module-allowed-modules-functions))
 - no access to environment variables, file system, network...
 - code executed in an isolated process
 - execution within configurable limits: timeout, maximum reductions and memory
