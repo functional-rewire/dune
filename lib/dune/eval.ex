@@ -87,6 +87,6 @@ defmodule Dune.Eval do
   # bug when evaluating plain atoms
   # FIXME: remove this when removing support for Elixir 1.12
   # https://github.com/elixir-lang/elixir/commit/8d5c07c1a4c9f770e731aee1a946537cc9d1be5e#diff-4ef990cb3eea7c6f679e231c209b8e72b628b95318756d6620883131ae084b1c
-  defp fix_atom_bug([{{:env__Dune__, nil}, _}]), do: []
+  defp fix_atom_bug([{{:env__Dune__, nil}, env}]), do: [env__Dune__: env]
   defp fix_atom_bug(bindings), do: bindings
 end

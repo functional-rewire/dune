@@ -95,5 +95,14 @@ defmodule Dune.SessionTest do
                bindings: []
              } = session
     end
+
+    test "does not break due to Elixir single atom bug" do
+      session = Session.new() |> Session.eval_string(":foo")
+
+      assert %Session{
+               last_result: %Success{inspected: ":foo"},
+               bindings: []
+             } = session
+    end
   end
 end
