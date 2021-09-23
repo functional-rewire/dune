@@ -73,13 +73,13 @@ defmodule Dune.SessionTest do
     test "keeps the module mapping" do
       session =
         Session.new()
-        |> Session.eval_string("acbd = [A]")
-        |> Session.eval_string("acbd = acbd ++ [B]")
-        |> Session.eval_string("acbd = acbd ++ [A.B]")
-        |> Session.eval_string("acbd ++ [C.D]")
+        |> Session.eval_string("acbd = [Aa]")
+        |> Session.eval_string("acbd = acbd ++ [Bb]")
+        |> Session.eval_string("acbd = acbd ++ [Aa.Bb]")
+        |> Session.eval_string("acbd ++ [Cc.Dd]")
 
       assert %Session{
-               last_result: %Success{inspected: "[A, B, A.B, C.D]"},
+               last_result: %Success{inspected: "[Aa, Bb, Aa.Bb, Cc.Dd]"},
                bindings: [a__Dune_atom_1__: [Dune_Module_1__, Dune_Module_2__, Dune_Module_3__]]
              } = session
     end
