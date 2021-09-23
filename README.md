@@ -5,7 +5,7 @@
 
 A sandbox for Elixir to safely evaluate untrusted code from user input.
 
-[**Try it out online!**](https://playground.functional-rewire.com/)
+[**Try it out on our online playground!**](https://playground.functional-rewire.com/)
 
 `Dune` can be useful to develop playgrounds, online REPL, coding games, or
 customizable business logic.
@@ -16,9 +16,8 @@ access, e.g. to a database.
 
 ## Features
 
-- only authorized modules and functions can be executed (see
-  [`Dune.Allowlist.Default`](https://hexdocs.pm/dune/Dune.Allowlist.Default.html#module-allowed-modules-functions))
-- no access to environment variables, file system, network...
+- allowlist mechanism (customizable) to restrict execution to safe modules and
+  functions: no access to environment variables, file system, network...
 - code executed in an isolated process
 - execution within configurable limits: timeout, maximum reductions and memory
   (inspired by [Luerl](https://github.com/rvirding/luerl))
@@ -48,11 +47,12 @@ iex> Dune.eval_string("Enum.product(1..100_000)")
 ```
 
 The list of modules and functions authorized by default is defined by the
-`Dune.Allowlist.Default` module, but this list can be extended and customized
-(at your own risk!) using `Dune.Allowlist`.
+[`Dune.Allowlist.Default`](https://hexdocs.pm/dune/Dune.Allowlist.Default.html#module-allowed-modules-functions)
+module, but this list can be extended and customized (at your own risk!) using
+[`Dune.Allowlist`](https://hexdocs.pm/dune/Dune.Allowlist.html).
 
 If you need to keep the state between evaluations, you might consider
-`Dune.Session`:
+[`Dune.Session`](https://hexdocs.pm/dune/Dune.Session.html):
 
 ```elixir
 iex> Dune.Session.new()
