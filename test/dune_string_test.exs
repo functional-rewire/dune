@@ -396,6 +396,11 @@ defmodule DuneStringTest do
                type: :restricted,
                message: "** (DuneRestrictedError) function :erlang.get/0 is restricted"
              } = ~E':erlang.get()'
+
+      assert %Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) function :erlang.process_info/1 is restricted"
+             } = ~E':erlang.process_info(self)'
     end
 
     test "nested restricted code" do
