@@ -10,9 +10,9 @@ A sandbox for Elixir to safely evaluate untrusted code from user input.
 `Dune` can be useful to develop playgrounds, online REPL, coding games, or
 customizable business logic.
 
-**Warning:** `Dune` is still early stage: expect bugs and vulnerabilities. Use
-at your own risk and avoid running it directly on a server with any sensitive
-access, e.g. to a database.
+**Warning:** `Dune` cannot offer strong security guarantees (see the
+[Security guarantees](#security-guarantees) section below). Besides, it is still
+early stage: expect bugs and vulnerabilities.
 
 ## Features
 
@@ -69,6 +69,24 @@ advanced features (at least at this stage) such as:
 - custom structs / behaviours / protocols
 - concurrency / processes / OTP
 - metaprogramming
+
+## Security guarantees
+
+Because of the approch being used, Dune cannot offer strong security guarantees,
+and should not be considered a sufficient security layer by itself.
+
+A best-effort approach is made to prevent attackers from getting outside of the
+original process and from calling any function/macro outside of the allowlist.
+However, it is impossible to prove that all escape paths have been completely
+blocked. Due to how the Erlang VM works, an attacker able to escape the sandbox
+could get full access to the VM without restriction.
+
+See the
+[EEF guidelines about sandboxing](https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/sandboxing)
+for more information.
+
+Use at your own risk and avoid running it directly on a server with any
+sensitive access, e.g. to a database.
 
 ## Installation
 
