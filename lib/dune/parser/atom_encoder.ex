@@ -2,7 +2,6 @@ defmodule Dune.Parser.AtomEncoder do
   @moduledoc false
 
   alias Dune.AtomMapping
-  alias Dune.Parser.Opts
 
   @type mapping :: [{atom, String.t()}]
 
@@ -148,10 +147,9 @@ defmodule Dune.Parser.AtomEncoder do
     end)
   end
 
-  @spec static_atoms_encoder(String.t(), Opts.t()) :: {:ok, atom} | {:error, String.t()}
-  def static_atoms_encoder(binary, opts) when is_binary(binary) do
-    Process.put(:__Dune_atom_pool_size__, opts.atom_pool_size)
-
+  @spec static_atoms_encoder(String.t(), non_neg_integer()) :: {:ok, atom} | {:error, String.t()}
+  def static_atoms_encoder(binary, pool_size)
+      when is_binary(binary) and is_integer(pool_size) do
     case @module_reprs do
       %{^binary => atom} ->
         {:ok, atom}
@@ -160,25 +158,25 @@ defmodule Dune.Parser.AtomEncoder do
         if binary =~ "Dune" do
           {:error, "Atoms containing `Dune` are restricted for safety"}
         else
-          do_static_atoms_encoder(binary)
+          do_static_atoms_encoder(binary, pool_size)
         end
     end
   end
 
-  defp do_static_atoms_encoder(binary) do
+  defp do_static_atoms_encoder(binary, pool_size) do
     process_key = {:__Dune_atom__, binary}
 
     case Process.get(process_key, nil) do
-      nil -> do_static_atoms_encoder(binary, process_key)
+      nil -> do_static_atoms_encoder(binary, process_key, pool_size)
       atom when is_atom(atom) -> {:ok, atom}
     end
   end
 
-  defp do_static_atoms_encoder(binary, process_key) do
+  defp do_static_atoms_encoder(binary, process_key, pool_size) do
     {:ok, String.to_existing_atom(binary)}
   rescue
     ArgumentError ->
-      case new_atom(binary) do
+      case new_atom(binary, pool_size) do
         {:ok, atom} ->
           Process.put(process_key, atom)
           {:ok, atom}
@@ -196,10 +194,10 @@ defmodule Dune.Parser.AtomEncoder do
     |> AtomMapping.from_atoms()
   end
 
-  defp new_atom(binary) do
+  defp new_atom(binary, pool_size) do
     count = Process.get(:__Dune_atom_count__, 0) + 1
 
-    if count * @atom_categories > Process.get(:__Dune_atom_pool_size__) do
+    if count * @atom_categories > pool_size do
       {:error, "atom_pool_size exceeded, failed to parse atom"}
     else
       Process.put(:__Dune_atom_count__, count)

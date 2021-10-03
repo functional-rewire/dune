@@ -15,9 +15,9 @@ defmodule Dune.Parser.StringParser do
     |> Task.await()
   end
 
-  defp do_parse_string(string, opts, previous_session) do
+  defp do_parse_string(string, %Opts{atom_pool_size: pool_size}, previous_session) do
     maybe_load_atom_mapping(previous_session)
-    encoder = fn binary, _ctx -> AtomEncoder.static_atoms_encoder(binary, opts) end
+    encoder = fn binary, _ctx -> AtomEncoder.static_atoms_encoder(binary, pool_size) end
 
     case Code.string_to_quoted(string, static_atoms_encoder: encoder) do
       {:ok, ast} -> encode_modules(ast, previous_session)
