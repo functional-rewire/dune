@@ -155,13 +155,34 @@ defmodule Dune.Parser.AtomEncoder do
         {:ok, atom}
 
       _ ->
-        if binary =~ "Dune" do
-          {:error, "Atoms containing `Dune` are restricted for safety"}
-        else
-          do_static_atoms_encoder(binary, pool_size)
+        cond do
+          binary =~ "Dune" ->
+            {:error, "Atoms containing `Dune` are restricted for safety"}
+
+          module_name = extract_elixir_prefixed_module(binary) ->
+            with {:ok, atom} <- do_static_atoms_encoder(module_name, pool_size) do
+              {:ok, {:__aliases__, [], [Elixir, atom]}}
+            end
+
+          true ->
+            do_static_atoms_encoder(binary, pool_size)
         end
     end
   end
+
+  defp extract_elixir_prefixed_module("Elixir." <> rest) do
+    charlist = String.to_charlist(rest)
+
+    case Code.cursor_context(charlist) do
+      {:alias, ^charlist} ->
+        rest
+
+      _ ->
+        nil
+    end
+  end
+
+  defp extract_elixir_prefixed_module(_binary), do: nil
 
   defp do_static_atoms_encoder(binary, pool_size) do
     process_key = {:__Dune_atom__, binary}
@@ -226,7 +247,7 @@ defmodule Dune.Parser.AtomEncoder do
     {new_ast, acc} =
       Macro.postwalk(ast, initial_acc, fn
         {:__aliases__, ctx, atoms}, acc ->
-          {modules, new_acc} = map_modules_ast(atoms, acc)
+          {modules, new_acc} = remove_elixir_prefix(atoms) |> map_modules_ast(acc)
           {{:__aliases__, ctx, modules}, new_acc}
 
         other, acc ->
@@ -248,6 +269,9 @@ defmodule Dune.Parser.AtomEncoder do
       {atoms, atom}
     end)
   end
+
+  defp remove_elixir_prefix([Elixir | atoms]) when atoms not in [[], [Elixir]], do: atoms
+  defp remove_elixir_prefix(atoms), do: atoms
 
   defp map_modules_ast(atoms, acc) do
     case acc do

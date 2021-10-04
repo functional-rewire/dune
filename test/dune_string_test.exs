@@ -212,6 +212,22 @@ defmodule DuneStringTest do
              } = ~E'[Foo91, {:foo91, :Foo91}, %{foo91: 15, Foo91: 6, _foo92: 33}]'
     end
 
+    test "atoms (prefixed by Elixir)" do
+      assert %Success{value: Elixir, inspected: ~s'Elixir'} = ~E'Elixir'
+
+      assert %Success{value: Dune_Module_1__, inspected: ~s'Foo13'} = ~E'Foo13'
+      assert %Success{value: Dune_Module_1__, inspected: ~s'Foo13'} = ~E'Elixir.Foo13'
+      assert %Success{value: Dune_Module_1__, inspected: ~s'Foo13'} = ~E':"Elixir.Foo13"'
+
+      assert %Success{value: true, inspected: ~s'true'} = ~E'Elixir.Foo13 == Foo13'
+      assert %Success{value: true, inspected: ~s'true'} = ~E':"Elixir.Foo13" == Foo13'
+
+      assert %Success{value: String, inspected: ~s'String'} = ~E':"Elixir.String"'
+
+      assert %Success{value: Dune_Module_1__, inspected: ~s'Elixir.Elixir'} = ~E'Elixir.Elixir'
+      assert %Success{value: Dune_Module_1__, inspected: ~s'Elixir.Elixir'} = ~E':"Elixir.Elixir"'
+    end
+
     test "function and atom parameters" do
       assert ":digits" = ~E':digits'.value |> inspect()
       assert ":turkic" = ~E':turkic'.value |> inspect()
