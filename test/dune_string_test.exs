@@ -215,12 +215,14 @@ defmodule DuneStringTest do
     test "atoms (prefixed by Elixir)" do
       assert %Success{value: Elixir, inspected: ~s'Elixir'} = ~E'Elixir'
 
-      assert %Success{value: Dune_Module_1__, inspected: ~s'Foo13'} = ~E'Foo13'
       assert %Success{value: Dune_Module_1__, inspected: ~s'Foo13'} = ~E'Elixir.Foo13'
       assert %Success{value: Dune_Module_1__, inspected: ~s'Foo13'} = ~E':"Elixir.Foo13"'
 
       assert %Success{value: true, inspected: ~s'true'} = ~E'Elixir.Foo13 == Foo13'
       assert %Success{value: true, inspected: ~s'true'} = ~E':"Elixir.Foo13" == Foo13'
+
+      assert %Success{value: true, inspected: ~s'true'} = ~E'Elixir.Foo13.Foo13 == Foo13.Foo13'
+      assert %Success{value: true, inspected: ~s'true'} = ~E':"Elixir.Foo13.Foo13" == Foo13.Foo13'
 
       assert %Success{value: String, inspected: ~s'String'} = ~E':"Elixir.String"'
 
