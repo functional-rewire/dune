@@ -3,6 +3,7 @@ defmodule Dune.Parser.AtomEncoder do
 
   alias Dune.AtomMapping
 
+  @type atom_category :: :alias | :private_var | :public_var | :other
   @type mapping :: [{atom, String.t()}]
 
   @atom_categories 4
@@ -155,58 +156,47 @@ defmodule Dune.Parser.AtomEncoder do
         {:ok, atom}
 
       _ ->
-        cond do
-          binary =~ "Dune" ->
-            {:error, "Atoms containing `Dune` are restricted for safety"}
-
-          module_parts = extract_elixir_prefixed_module(binary) ->
-            encode_many_atoms(module_parts, pool_size, [])
-
-          true ->
-            do_static_atoms_encoder(binary, pool_size)
+        if binary =~ "Dune" do
+          {:error, "Atoms containing `Dune` are restricted for safety"}
+        else
+          atom_category = categorize_atom_binary(binary)
+          do_static_atoms_encoder(binary, atom_category, pool_size)
         end
     end
   end
 
-  defp extract_elixir_prefixed_module("Elixir." <> rest) do
-    charlist = String.to_charlist(rest)
+  @spec categorize_atom_binary(binary) :: atom_category
+  def categorize_atom_binary(atom_binary) do
+    charlist = String.to_charlist(atom_binary)
 
-    case Code.cursor_context(charlist) do
-      {:alias, ^charlist} ->
-        String.split(rest, ".")
-
-      _ ->
-        nil
+    case {Code.cursor_context(charlist), atom_binary} do
+      {{:alias, ^charlist}, _} -> :alias
+      {{:local_or_var, ^charlist}, "_" <> _} -> :private_var
+      {{:local_or_var, ^charlist}, _} -> :public_var
+      _ -> :other
     end
   end
 
-  defp extract_elixir_prefixed_module(_binary), do: nil
-
-  defp encode_many_atoms([], _pool_size, acc) do
-    {:ok, {:__aliases__, [], [Elixir | Enum.reverse(acc)]}}
+  defp do_static_atoms_encoder("Elixir." <> rest, :alias, pool_size) do
+    rest
+    |> String.split(".")
+    |> encode_many_atoms(pool_size, [])
   end
 
-  defp encode_many_atoms([head | tail], pool_size, acc) do
-    case do_static_atoms_encoder(head, pool_size) do
-      {:ok, atom} -> encode_many_atoms(tail, pool_size, [atom | acc])
-      {:error, error} -> error
-    end
-  end
-
-  defp do_static_atoms_encoder(binary, pool_size) do
+  defp do_static_atoms_encoder(binary, atom_category, pool_size) do
     process_key = {:__Dune_atom__, binary}
 
     case Process.get(process_key, nil) do
-      nil -> do_static_atoms_encoder(binary, process_key, pool_size)
+      nil -> do_static_atoms_encoder(binary, atom_category, process_key, pool_size)
       atom when is_atom(atom) -> {:ok, atom}
     end
   end
 
-  defp do_static_atoms_encoder(binary, process_key, pool_size) do
+  defp do_static_atoms_encoder(binary, atom_category, process_key, pool_size) do
     {:ok, String.to_existing_atom(binary)}
   rescue
     ArgumentError ->
-      case new_atom(binary, pool_size) do
+      case new_atom(atom_category, pool_size) do
         {:ok, atom} ->
           Process.put(process_key, atom)
           {:ok, atom}
@@ -214,6 +204,17 @@ defmodule Dune.Parser.AtomEncoder do
         {:error, error} ->
           {:error, error}
       end
+  end
+
+  defp encode_many_atoms([], _pool_size, acc) do
+    {:ok, {:__aliases__, [], [Elixir | Enum.reverse(acc)]}}
+  end
+
+  defp encode_many_atoms([head | tail], pool_size, acc) do
+    case do_static_atoms_encoder(head, :alias, pool_size) do
+      {:ok, atom} -> encode_many_atoms(tail, pool_size, [atom | acc])
+      {:error, error} -> error
+    end
   end
 
   @spec plain_atom_mapping :: AtomMapping.t()
@@ -224,28 +225,28 @@ defmodule Dune.Parser.AtomEncoder do
     |> AtomMapping.from_atoms()
   end
 
-  defp new_atom(binary, pool_size) do
+  defp new_atom(atom_category, pool_size) do
     count = Process.get(:__Dune_atom_count__, 0) + 1
 
     if count * @atom_categories > pool_size do
       {:error, "atom_pool_size exceeded, failed to parse atom"}
     else
       Process.put(:__Dune_atom_count__, count)
-      atom = do_new_atom(binary, count)
+      atom = do_new_atom(atom_category, count)
       {:ok, atom}
     end
   end
 
-  defp do_new_atom(<<h::8, _::binary>>, count) when h in ?A..?Z do
+  defp do_new_atom(:alias, count) do
     :"Dune_Atom_#{count}__"
   end
 
-  defp do_new_atom("_" <> _binary, count) do
-    :"__Dune_atom_#{count}__"
+  defp do_new_atom(:public_var, count) do
+    :"a__Dune_atom_#{count}__"
   end
 
-  defp do_new_atom(binary, count) when is_binary(binary) do
-    :"a__Dune_atom_#{count}__"
+  defp do_new_atom(category, count) when category in [:private_var, :other] do
+    :"__Dune_atom_#{count}__"
   end
 
   @spec encode_modules(Macro.t(), AtomMapping.t(), AtomMapping.t() | nil) ::
