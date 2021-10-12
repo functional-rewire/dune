@@ -297,7 +297,8 @@ defmodule DuneStringTest do
     test "atom interpolation" do
       assert %Failure{
                type: :restricted,
-               message: "** (DuneRestrictedError) function :erlang.binary_to_atom/2 is restricted"
+               message:
+                 "** (DuneRestrictedError) function :erlang.binary_to_existing_atom/2 is restricted"
              } = ~E':"#{1 + 1} is two"'
     end
 

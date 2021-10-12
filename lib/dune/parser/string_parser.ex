@@ -19,7 +19,7 @@ defmodule Dune.Parser.StringParser do
     maybe_load_atom_mapping(previous_session)
     encoder = fn binary, _ctx -> AtomEncoder.static_atoms_encoder(binary, pool_size) end
 
-    case Code.string_to_quoted(string, static_atoms_encoder: encoder) do
+    case Code.string_to_quoted(string, static_atoms_encoder: encoder, existing_atoms_only: true) do
       {:ok, ast} -> encode_modules(ast, previous_session)
       {:error, {_ctx, error, token}} -> handle_failure(error, token)
     end
