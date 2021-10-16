@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.1.1 (2021-10-16)
+
 ### Bug fixes
 
 - Prevent atom leaks due to `Code.string_to_quoted/2` not respecting
