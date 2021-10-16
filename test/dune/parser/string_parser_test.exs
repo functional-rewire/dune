@@ -36,7 +36,8 @@ defmodule Dune.Parser.StringParserTest do
                ast: :a__Dune_atom_1__,
                atom_mapping: %AtomMapping{
                  atoms: %{a__Dune_atom_1__: "my_atom"},
-                 modules: %{}
+                 modules: %{},
+                 extra_info: %{}
                }
              } == StringParser.parse_string(":my_atom", %Opts{}, nil)
 
@@ -44,7 +45,8 @@ defmodule Dune.Parser.StringParserTest do
                ast: :__Dune_atom_1__,
                atom_mapping: %AtomMapping{
                  atoms: %{__Dune_atom_1__: "_my_atom"},
-                 modules: %{}
+                 modules: %{},
+                 extra_info: %{}
                }
              } == StringParser.parse_string(":_my_atom", %Opts{}, nil)
 
@@ -52,7 +54,8 @@ defmodule Dune.Parser.StringParserTest do
                ast: :Dune_Atom_1__,
                atom_mapping: %AtomMapping{
                  atoms: %{Dune_Atom_1__: "MyAtom"},
-                 modules: %{}
+                 modules: %{},
+                 extra_info: %{}
                }
              } == StringParser.parse_string(":MyAtom", %Opts{}, nil)
     end
@@ -62,7 +65,8 @@ defmodule Dune.Parser.StringParserTest do
                ast: {:__aliases__, [line: 1], [:Dune_Module_1__]},
                atom_mapping: %AtomMapping{
                  atoms: %{Dune_Atom_1__: "MyModule"},
-                 modules: %{Dune_Module_1__ => "MyModule"}
+                 modules: %{Dune_Module_1__ => "MyModule"},
+                 extra_info: %{}
                }
              } == StringParser.parse_string("MyModule", %Opts{}, nil)
 
@@ -70,7 +74,8 @@ defmodule Dune.Parser.StringParserTest do
                ast: {:__aliases__, [line: 1], [:Dune_Module_1__]},
                atom_mapping: %AtomMapping{
                  atoms: %{Dune_Atom_1__: "My", Dune_Atom_2__: "AwesomeModule"},
-                 modules: %{Dune_Module_1__ => "My.AwesomeModule"}
+                 modules: %{Dune_Module_1__ => "My.AwesomeModule"},
+                 extra_info: %{}
                }
              } == StringParser.parse_string("My.AwesomeModule", %Opts{}, nil)
 
@@ -78,9 +83,30 @@ defmodule Dune.Parser.StringParserTest do
                ast: {:__aliases__, [line: 1], [:Dune_Module_1__]},
                atom_mapping: %AtomMapping{
                  atoms: %{Dune_Atom_1__: "My"},
-                 modules: %{Dune_Module_1__ => "My.Module"}
+                 modules: %{Dune_Module_1__ => "My.Module"},
+                 extra_info: %{}
                }
              } == StringParser.parse_string("My.Module", %Opts{}, nil)
+    end
+
+    test ~S[non-existing "wrapped" atoms (with whitespace)] do
+      assert %UnsafeAst{
+               ast: :__Dune_atom_1__,
+               atom_mapping: %AtomMapping{
+                 atoms: %{__Dune_atom_1__: " "},
+                 modules: %{},
+                 extra_info: %{__Dune_atom_1__: :wrapped}
+               }
+             } == StringParser.parse_string(~S(:" "), %Opts{}, nil)
+
+      assert %UnsafeAst{
+               ast: :__Dune_atom_1__,
+               atom_mapping: %AtomMapping{
+                 atoms: %{__Dune_atom_1__: "my atom"},
+                 modules: %{},
+                 extra_info: %{__Dune_atom_1__: :wrapped}
+               }
+             } == StringParser.parse_string(~S(:"my atom"), %Opts{}, nil)
     end
   end
 end

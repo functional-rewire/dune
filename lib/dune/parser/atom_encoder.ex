@@ -199,6 +199,11 @@ defmodule Dune.Parser.AtomEncoder do
       case new_atom(atom_category, pool_size) do
         {:ok, atom} ->
           Process.put(process_key, atom)
+
+          if atom_category == :other do
+            Process.put({:__Dune_atom_extra_info__, atom}, :wrapped)
+          end
+
           {:ok, atom}
 
         {:error, error} ->
@@ -219,10 +224,17 @@ defmodule Dune.Parser.AtomEncoder do
 
   @spec plain_atom_mapping :: AtomMapping.t()
   def plain_atom_mapping() do
-    for {{:__Dune_atom__, binary}, atom} <- Process.get() do
-      {atom, binary}
-    end
-    |> AtomMapping.from_atoms()
+    atoms =
+      for {{:__Dune_atom__, binary}, atom} <- Process.get() do
+        {atom, binary}
+      end
+
+    extra_info =
+      for {{:__Dune_atom_extra_info__, atom}, info} <- Process.get() do
+        {atom, info}
+      end
+
+    AtomMapping.from_atoms(atoms, extra_info)
   end
 
   defp new_atom(atom_category, pool_size) do

@@ -58,9 +58,19 @@ defmodule Dune.Shims.Kernel do
     end
   end
 
-  def safe_inspect(env, term, opts \\ []) do
-    inspected = inspect(term, opts)
+  def safe_inspect(env, term, opts \\ [])
 
+  def safe_inspect(_env, term, opts)
+      when is_number(term) or is_binary(term) or is_boolean(term) do
+    inspect(term, opts)
+  end
+
+  def safe_inspect(env, atom, _opts) when is_atom(atom) do
+    AtomMapping.inspect(env.atom_mapping, atom)
+  end
+
+  def safe_inspect(env, term, opts) do
+    inspected = inspect(term, opts)
     AtomMapping.replace_in_string(env.atom_mapping, inspected)
   end
 

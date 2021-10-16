@@ -2,8 +2,9 @@ defmodule Dune.Eval do
   @moduledoc false
 
   alias Dune.{AtomMapping, Success, Failure}
-  alias Dune.Parser.SafeAst
   alias Dune.Eval.{Env, Opts}
+  alias Dune.Parser.SafeAst
+  alias Dune.Shims
 
   @eval_env [
     requires: [Kernel, Dune.Shims.Kernel],
@@ -60,28 +61,34 @@ defmodule Dune.Eval do
 
   defp do_safe_eval(safe_ast, env, nil) do
     binding = [env__Dune__: env]
-    {value, _bindings} = Code.eval_quoted(safe_ast, binding, @eval_env)
+    {value, new_env, _new_bindings} = do_eval_quoted(safe_ast, binding)
 
     %Success{
       value: value,
       # another important thing about inspect/1 is that it force-evalates
       # potentially huge shared structs => OOM before sending
-      inspected: inspect(value),
+      inspected: Shims.Kernel.safe_inspect(new_env, value),
       stdio: ""
     }
   end
 
   defp do_safe_eval(safe_ast, env, bindings) when is_list(bindings) do
     binding = [env__Dune__: env] ++ bindings
+    {value, new_env, new_bindings} = do_eval_quoted(safe_ast, binding)
+
+    %Success{
+      value: {value, new_env, new_bindings},
+      inspected: Shims.Kernel.safe_inspect(new_env, value),
+      stdio: ""
+    }
+  end
+
+  defp do_eval_quoted(safe_ast, binding) do
     {value, bindings} = Code.eval_quoted(safe_ast, binding, @eval_env)
 
     {new_env, new_bindings} = fix_atom_bug(bindings) |> Keyword.pop!(:env__Dune__)
 
-    %Success{
-      value: {value, new_env, new_bindings},
-      inspected: inspect(value),
-      stdio: ""
-    }
+    {value, new_env, new_bindings}
   end
 
   # bug when evaluating plain atoms
