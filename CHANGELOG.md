@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.1.2 (2021-10-17)
+
 ### Enhancements
 
 - Allow safe functions from the `:erlang` module
