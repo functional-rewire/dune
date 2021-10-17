@@ -81,8 +81,14 @@ defmodule Dune.Parser.Sanitizer do
   end
 
   defp do_sanitize_main(single, env) do
-    {[safe_single], env} = do_sanitize_main_list([single], env)
-    {:ok, safe_single, env}
+    case do_sanitize_main_list([single], env) do
+      {[safe_single], env} ->
+        {:ok, safe_single, env}
+
+      {list_ast, env} when is_list(list_ast) ->
+        block_ast = {:__block__, [], list_ast}
+        {:ok, block_ast, env}
+    end
   end
 
   defp do_sanitize_main_list(list, env) when is_list(list) do
@@ -101,7 +107,16 @@ defmodule Dune.Parser.Sanitizer do
       end)
 
     module_definitions = Enum.map(raw_fun_definitions, &sanitize_module_definition(&1, env))
-    sanitized_instructions = do_sanitize(instructions, env)
+
+    sanitized_instructions =
+      case {raw_fun_definitions, do_sanitize(instructions, env)} do
+        {[_ | _], []} ->
+          {last_module, _} = List.last(raw_fun_definitions)
+          [quote(do: {:module, unquote(last_module), nil, nil})]
+
+        {_, sanitized_instructions} ->
+          sanitized_instructions
+      end
 
     {module_definitions ++ sanitized_instructions, env}
   end
@@ -194,8 +209,6 @@ defmodule Dune.Parser.Sanitizer do
           unquote(module),
           %Dune.Eval.FakeModule{public_funs: unquote(public_funs_ast)}
         )
-
-      {:module, unquote(module), nil, nil}
     end
   end
 
