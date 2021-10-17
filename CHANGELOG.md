@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Enhancements
+
+- Allow safe functions from the `:erlang` module
+
 ### Bug fixes
 
 - Fix bug when calling custom function in nested AST
