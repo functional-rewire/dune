@@ -251,36 +251,34 @@ defmodule Dune.Parser.Sanitizer do
   end
 
   defp env_variable_if_used(asts) do
-    case do_uses_variable_list(asts, @env_variable_name) do
+    uses_variable?(asts, @env_variable_name)
+
+    case uses_variable?(asts, @env_variable_name) do
       true -> env_variable()
       false -> underscore_env_variable()
     end
   end
 
-  def uses_variable?(ast, variable_name) when is_atom(variable_name) do
-    do_uses_variable(ast, variable_name)
-  end
+  defp uses_variable?([], _variable_name), do: false
 
-  defp do_uses_variable({variable_name, _, nil}, variable_name), do: true
-
-  defp do_uses_variable({_, _, list}, variable_name) when is_list(list) do
-    do_uses_variable_list(list, variable_name)
-  end
-
-  defp do_uses_variable(list, variable_name) when is_list(list) do
-    do_uses_variable_list(list, variable_name)
-  end
-
-  defp do_uses_variable(_ast, _variable_name), do: false
-
-  defp do_uses_variable_list([], _variable_name), do: false
-
-  defp do_uses_variable_list([head | tail], variable_name) do
-    case do_uses_variable(head, variable_name) do
+  defp uses_variable?([head | tail], variable_name) do
+    case uses_variable?(head, variable_name) do
       true -> true
-      false -> do_uses_variable(tail, variable_name)
+      false -> uses_variable?(tail, variable_name)
     end
   end
+
+  defp uses_variable?({variable_name, _, nil}, variable_name), do: true
+
+  defp uses_variable?({_, _, list}, variable_name) when is_list(list) do
+    uses_variable?(list, variable_name)
+  end
+
+  defp uses_variable?({x, y}, variable_name) do
+    uses_variable?(x, variable_name) or uses_variable?(y, variable_name)
+  end
+
+  defp uses_variable?(_ast, _variable_name), do: false
 
   defp do_sanitize(ast, env)
 

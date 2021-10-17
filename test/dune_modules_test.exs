@@ -65,6 +65,25 @@ defmodule DuneModulesTest do
       assert %Success{value: 1101} = result
     end
 
+    test "recursive functions in a nested block" do
+      result = ~E'''
+      defmodule My.List do
+        def my_sum([]), do: 0
+        def my_sum([h | t]) do
+          if is_number(h) do
+            h + my_sum(t)
+          else
+            :NaN
+          end
+        end
+      end
+
+      My.List.my_sum([1, 100, 1000])
+      '''
+
+      assert %Success{value: 1101} = result
+    end
+
     test "public and private functions" do
       assert %Success{value: "success!"} = ~E'''
              defmodule My.Module do

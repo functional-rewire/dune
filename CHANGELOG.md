@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Bug fixes
+
+- Fix bug when calling custom function in nested AST
+
 ## v0.1.1 (2021-10-16)
 
 ### Bug fixes
