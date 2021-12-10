@@ -86,14 +86,8 @@ defmodule Dune.Eval do
   defp do_eval_quoted(safe_ast, binding) do
     {value, bindings} = Code.eval_quoted(safe_ast, binding, @eval_env)
 
-    {new_env, new_bindings} = fix_atom_bug(bindings) |> Keyword.pop!(:env__Dune__)
+    {new_env, new_bindings} = Keyword.pop!(bindings, :env__Dune__)
 
     {value, new_env, new_bindings}
   end
-
-  # bug when evaluating plain atoms
-  # FIXME: remove this when removing support for Elixir 1.12
-  # https://github.com/elixir-lang/elixir/commit/8d5c07c1a4c9f770e731aee1a946537cc9d1be5e#diff-4ef990cb3eea7c6f679e231c209b8e72b628b95318756d6620883131ae084b1c
-  defp fix_atom_bug([{{:env__Dune__, nil}, env}]), do: [env__Dune__: env]
-  defp fix_atom_bug(bindings), do: bindings
 end
