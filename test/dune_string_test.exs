@@ -237,11 +237,13 @@ defmodule DuneStringTest do
       assert %Success{value: " ", inspected: ~s'" "'} = ~E'to_string :" "'
       assert %Success{value: "foo/bar", inspected: ~s'"foo/bar"'} = ~E'to_string :"foo/bar"'
 
-      # FIXME: fix test once Elixir tokenizer is fixed
-      # assert %Success{
-      #          value: ["TODO"],
-      #          inspected: ~s([" ": {:"\t", :" A"}, "ab cd": %{abc: 6, "foo+91": :'15'}])
-      #        } = ~E([" ": {:"\t", :" A"}, "ab cd": %{abc: 6, "foo+91": :'15'}])
+      assert %Success{
+               value: [
+                 __Dune_atom_1__: {:__Dune_atom_2__, :__Dune_atom_3__},
+                 __Dune_atom_4__: %{__Dune_atom_5__: :__Dune_atom_6__, a__Dune_atom_7__: 6}
+               ],
+               inspected: ~s([" ": {:"\t", :" A"}, "ab cd": %{"foo+91": :"15", abc: 6}])
+             } = ~E([" ": {:"\t", :" A"}, "ab cd": %{"foo+91": :'15', abc: 6}])
     end
 
     test "function and atom parameters" do

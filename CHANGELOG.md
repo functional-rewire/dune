@@ -2,6 +2,12 @@
 
 ## Dev
 
+### Breaking changes
+
+- Support Elixir 1.13, drop support for 1.12
+- This fixes a [bug in atoms](https://github.com/elixir-lang/elixir/pull/11313)
+  was due to the Elixir parser
+
 ## v0.1.2 (2021-10-17)
 
 ### Enhancements

@@ -93,15 +93,21 @@ defmodule Dune.AtomMapping do
   defp do_replace_in_string(mapping = %__MODULE__{}, string) do
     string_replace_map =
       %{}
-      |> build_replace_map(mapping.modules, &inspect/1)
-      |> build_replace_map(mapping.atoms, &Atom.to_string/1)
+      |> build_replace_map(mapping.modules, nil, &inspect/1)
+      |> build_replace_map(mapping.atoms, mapping.extra_info, &Atom.to_string/1)
 
     String.replace(string, @dune_atom_regex, &Map.get(string_replace_map, &1, &1))
   end
 
-  defp build_replace_map(map, sub_mapping, to_string_fun) do
+  defp build_replace_map(map, sub_mapping, extra_info, to_string_fun) do
     for {subsitute_atom, original_string} <- sub_mapping, into: map do
-      {to_string_fun.(subsitute_atom), original_string}
+      replace_by =
+        case extra_info do
+          %{^subsitute_atom => :wrapped} -> ~s("#{original_string}")
+          _ -> original_string
+        end
+
+      {to_string_fun.(subsitute_atom), replace_by}
     end
   end
 
