@@ -256,7 +256,7 @@ defmodule DuneStringTest do
       assert %Success{value: :ok, inspected: ~s(:ok), stdio: "foo987\n"} = ~E'IO.puts(:foo987)'
 
       assert %Success{value: :ok, inspected: ~s(:ok), stdio: "hello world!\n"} =
-               ~E'io = IO; io.puts(["hello", ?\ , "world", ?!])'
+               ~E'io = IO; io.puts(["hello", ?\s, "world", ?!])'
 
       assert %Success{value: :ok, inspected: ~s(:ok), stdio: "1\n2\n3\n"} =
                ~E'Enum.each(1..3, &IO.puts/1)'
