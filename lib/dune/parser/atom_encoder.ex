@@ -169,7 +169,7 @@ defmodule Dune.Parser.AtomEncoder do
   def categorize_atom_binary(atom_binary) do
     charlist = String.to_charlist(atom_binary)
 
-    case {Code.cursor_context(charlist), atom_binary} do
+    case {Code.Fragment.cursor_context(charlist), atom_binary} do
       {{:alias, ^charlist}, _} -> :alias
       {{:local_or_var, ^charlist}, "_" <> _} -> :private_var
       {{:local_or_var, ^charlist}, _} -> :public_var

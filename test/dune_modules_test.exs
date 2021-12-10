@@ -249,7 +249,7 @@ defmodule DuneModulesTest do
       assert %Failure{
                type: :module_restricted,
                message:
-                 "** (DuneRestrictedError) the following syntax is restricted inside defmodule:\n         def(no_block)"
+                 "** (DuneRestrictedError) the following syntax is restricted inside defmodule:\n         def no_block"
              } = ~E'''
              defmodule My.Module do
                def no_block
@@ -259,7 +259,7 @@ defmodule DuneModulesTest do
       assert %Failure{
                type: :module_restricted,
                message:
-                 "** (DuneRestrictedError) the following syntax is restricted inside defmodule:\n         @foo(1 + 1)"
+                 "** (DuneRestrictedError) the following syntax is restricted inside defmodule:\n         @foo 1 + 1"
              } = ~E'''
              defmodule My.Module do
                @foo 1 + 1
