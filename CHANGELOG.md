@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.2.0 (2022-01-02)
+
 ### Breaking changes
 
 - Support Elixir 1.13, drop support for 1.12
