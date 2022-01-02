@@ -2,6 +2,7 @@
 
 [![Hex Version](https://img.shields.io/hexpm/v/dune.svg)](https://hex.pm/packages/dune)
 [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/dune/)
+[![CI](https://github.com/functional-rewire/dune/workflows/CI/badge.svg)](https://github.com/functional-rewire/dune/actions?query=workflow%3ACI)
 
 A sandbox for Elixir to safely evaluate untrusted code from user input.
 
