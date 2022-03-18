@@ -253,6 +253,19 @@ defmodule DuneModulesTest do
              My.Module.private
              '''
     end
+
+    test "conflicting public and private functions" do
+      assert %Failure{
+               type: :exception,
+               message:
+                 "** (Dune.Eval.CompileError) nofile:3: defp conflicting/0 already defined as def in nofile:2"
+             } = ~E'''
+             defmodule My.Module do
+               def conflicting, do: "public"
+               defp conflicting, do: "private"
+             end
+             '''
+    end
   end
 
   describe "Dune restricted" do

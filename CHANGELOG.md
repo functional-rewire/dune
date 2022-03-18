@@ -5,6 +5,7 @@
 ### Bug fixes
 
 - Handle default arguments in functions
+- Handle conflicting `def` and `defp` with same name/arity
 
 ## v0.2.0 (2022-01-02)
 

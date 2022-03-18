@@ -40,6 +40,17 @@ defmodule Dune.Parser.Sanitizer do
 
         new_failure(:module_conflict, message, unsafe.atom_mapping)
 
+      {:definition_conflict, name_arity, previous_def, previous_ctx, conflict_def, conflict_ctx} ->
+        conflict_line = Keyword.get(conflict_ctx, :line)
+        previous_line = Keyword.get(previous_ctx, :line)
+        {name, arity} = name_arity
+
+        message =
+          "** (Dune.Eval.CompileError) nofile:#{conflict_line}: " <>
+            "#{conflict_def} #{name}/#{arity} already defined as #{previous_def} in nofile:#{previous_line}"
+
+        new_failure(:exception, message, unsafe.atom_mapping)
+
       {:parsing_error, ast} ->
         message = "dune parsing error: failed to safe parse\n         #{Macro.to_string(ast)}"
         new_failure(:parsing, message, unsafe.atom_mapping)
@@ -151,6 +162,7 @@ defmodule Dune.Parser.Sanitizer do
       |> Enum.filter(& &1)
       |> Enum.flat_map(&expand_defaults/1)
       |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
+      |> tap(&check_definition_conflicts/1)
 
     {module_name, fun_definitions}
   end
@@ -232,6 +244,32 @@ defmodule Dune.Parser.Sanitizer do
     acc = [{{name, arity}, definition} | acc]
 
     do_expand_defaults(name, arity, def_or_defp, defaults, acc)
+  end
+
+  defp check_definition_conflicts(grouped_definitions) do
+    Enum.each(grouped_definitions, fn {name_arity, [head | tail]} ->
+      check_definition_conflict(name_arity, head, tail)
+    end)
+  end
+
+  defp check_definition_conflict(_name_arity, _, []), do: :ok
+
+  defp check_definition_conflict(
+         name_arity,
+         head = {def_or_defp, _, _, _, _},
+         [
+           {def_or_defp, _, _, _, _} | rest
+         ]
+       ) do
+    check_definition_conflict(name_arity, head, rest)
+  end
+
+  defp check_definition_conflict(name_arity, {previous_def, previous_ctx, _, _, _}, [
+         {conflict_def, conflict_ctx, _, _, _} | _
+       ]) do
+    throw(
+      {:definition_conflict, name_arity, previous_def, previous_ctx, conflict_def, conflict_ctx}
+    )
   end
 
   defp parse_fun_signature({:when, _, [header, guards]}) do
