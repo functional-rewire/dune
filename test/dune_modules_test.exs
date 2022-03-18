@@ -6,7 +6,7 @@ defmodule DuneModulesTest do
   defmacro sigil_E(call, _expr) do
     # TODO fix memory needs
     quote do
-      Dune.eval_string(unquote(call), max_reductions: 20_000, max_heap_size: 25_000)
+      Dune.eval_string(unquote(call), max_reductions: 25_000, max_heap_size: 30_000)
     end
   end
 
@@ -50,6 +50,32 @@ defmodule DuneModulesTest do
                inspected: "{:module, Hello, nil, nil}",
                stdio: ""
              } = result
+    end
+
+    test "default argument" do
+      result = ~E'''
+      defmodule My.Default do
+        def incr(x \\ 0), do: x + 1
+      end
+
+      [My.Default.incr(), My.Default.incr(100)]
+      '''
+
+      assert %Success{value: [1, 101]} = result
+    end
+
+    test "default arguments" do
+      result = ~E'''
+      defmodule My.Defaults do
+        def defaults(a \\ 1, b \\ 2, c) do
+          [a, b, c]
+        end
+      end
+
+      {My.Defaults.defaults(:c), My.Defaults.defaults(:a, :c)}
+      '''
+
+      assert %Success{value: {[1, 2, :c], [:a, 2, :c]}} = result
     end
 
     test "recursive functions with guards" do

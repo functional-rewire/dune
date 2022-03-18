@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Bug fixes
+
+- Handle default arguments in functions
+
 ## v0.2.0 (2022-01-02)
 
 ### Breaking changes

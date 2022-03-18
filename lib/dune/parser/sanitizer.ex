@@ -149,6 +149,7 @@ defmodule Dune.Parser.Sanitizer do
       block_to_list(do_ast)
       |> Enum.map(&parse_fun_definition/1)
       |> Enum.filter(& &1)
+      |> Enum.flat_map(&expand_defaults/1)
       |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
 
     {module_name, fun_definitions}
@@ -161,9 +162,10 @@ defmodule Dune.Parser.Sanitizer do
        when def_or_defp in [:def, :defp] do
     {header, guards} = parse_fun_signature(signature)
     {name, args} = Macro.decompose_call(header)
+    {args, defaults} = extract_default_args(args, 0, [], [])
     name_arity = {name, length(args)}
     definition = {def_or_defp, ctx, args, body, guards}
-    {name_arity, definition}
+    {name_arity, definition, defaults}
   end
 
   defp parse_fun_definition({:@, _, [{doc, _, [value]}]})
@@ -181,6 +183,56 @@ defmodule Dune.Parser.Sanitizer do
   end
 
   # TODO else raise unsupported!
+
+  defp extract_default_args([], _index, arg_acc, defaults) do
+    {Enum.reverse(arg_acc), defaults}
+  end
+
+  defp extract_default_args([{:\\, _, [arg, default]} | args], index, arg_acc, defaults) do
+    extract_default_args(args, index + 1, [arg | arg_acc], [{index, default} | defaults])
+  end
+
+  defp extract_default_args([arg | args], index, arg_acc, defaults) do
+    extract_default_args(args, index + 1, [arg | arg_acc], defaults)
+  end
+
+  defp expand_defaults({name_arity, definition, _defaults = []}) do
+    [{name_arity, definition}]
+  end
+
+  defp expand_defaults({name_arity = {name, arity}, definition, defaults}) do
+    def_or_defp = elem(definition, 0)
+    do_expand_defaults(name, arity, def_or_defp, defaults, [{name_arity, definition}])
+  end
+
+  defp do_expand_defaults(_name, _arity, _def_or_defp, [], acc) do
+    acc
+  end
+
+  defp do_expand_defaults(
+         name,
+         arity,
+         def_or_defp,
+         [{default_index, default_value} | defaults],
+         acc
+       ) do
+    args = Macro.generate_arguments(arity, nil)
+    arity = arity - 1
+
+    args_without_default = List.delete_at(args, default_index)
+
+    args_in_expr =
+      Enum.with_index(args, fn
+        _arg, ^default_index -> default_value
+        arg, _index -> arg
+      end)
+
+    definition = {def_or_defp, [], args_without_default, {name, [], args_in_expr}, nil}
+
+    acc = [{{name, arity}, definition} | acc]
+
+    do_expand_defaults(name, arity, def_or_defp, defaults, acc)
+  end
 
   defp parse_fun_signature({:when, _, [header, guards]}) do
     {header, guards}
