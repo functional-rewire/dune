@@ -284,6 +284,21 @@ defmodule DuneModulesTest do
              '''
     end
 
+    test "unsafe function default arg" do
+      assert %Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) function System.get_env/0 is restricted"
+             } = ~E'''
+             defmodule Danger do
+               def danger(env \\ System.get_env()) do
+                 env
+               end
+             end
+
+             Danger.danger()
+             '''
+    end
+
     test "restrictions in the module top level" do
       assert %Failure{
                type: :module_restricted,
