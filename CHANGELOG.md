@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.2.1 (2022-03-19)
+
 ### Bug fixes
 
 - Handle default arguments in functions
