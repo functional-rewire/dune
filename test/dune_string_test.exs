@@ -690,5 +690,22 @@ defmodule DuneStringTest do
                 end
               '
     end
+
+    test "def/defp outside of module" do
+      assert %Failure{
+               type: :exception,
+               message: "** (ArgumentError) cannot invoke def/2 inside function/macro"
+             } = ~E'def foo(x), do: x + x'
+
+      assert %Failure{
+               type: :exception,
+               message: "** (ArgumentError) cannot invoke defp/2 inside function/macro"
+             } = ~E'defp foo(x), do: x + x'
+
+      assert %Failure{
+               type: :exception,
+               message: "** (ArgumentError) cannot invoke def/2 inside function/macro"
+             } = ~E'&def/2'
+    end
   end
 end

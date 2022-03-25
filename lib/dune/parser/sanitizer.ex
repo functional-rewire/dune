@@ -28,6 +28,10 @@ defmodule Dune.Parser.Sanitizer do
         failure = Failure.undefined_function(module, func_name, arity)
         AtomMapping.replace_in_result(unsafe.atom_mapping, failure)
 
+      {:outside_module, def_or_defp} ->
+        message = "** (ArgumentError) cannot invoke #{def_or_defp}/2 inside function/macro"
+        new_failure(:exception, message, unsafe.atom_mapping)
+
       {:module_restricted, ast} ->
         message =
           "** (DuneRestrictedError) the following syntax is restricted inside defmodule:\n         #{Macro.to_string(ast)}"
@@ -529,11 +533,8 @@ defmodule Dune.Parser.Sanitizer do
       :allowed ->
         sanitize_args_in_node(raw, env)
 
-      :undefined_module ->
-        throw({:undefined_module, module, func_name, arity})
-
-      :undefined_function ->
-        throw({:undefined_function, module, func_name, arity})
+      error ->
+        handle_mfa_error(error, module, func_name, arity)
     end
   end
 
@@ -586,12 +587,22 @@ defmodule Dune.Parser.Sanitizer do
       :allowed ->
         {:&, [], [raw]}
 
-      :undefined_module ->
-        throw({:undefined_module, module, func_name, arity})
-
-      :undefined_function ->
-        throw({:undefined_function, module, func_name, arity})
+      error ->
+        handle_mfa_error(error, module, func_name, arity)
     end
+  end
+
+  defp handle_mfa_error(:undefined_module, module, func_name, arity) do
+    throw({:undefined_module, module, func_name, arity})
+  end
+
+  defp handle_mfa_error(:undefined_function, module, func_name, arity) do
+    throw({:undefined_function, module, func_name, arity})
+  end
+
+  defp handle_mfa_error(:outside_module, _module, func_name, _arity)
+       when func_name in [:def, :defp] do
+    throw({:outside_module, func_name})
   end
 
   defp sanitize_capture(capture_arg, env) do

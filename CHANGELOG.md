@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Enhancements
+
+- Better error message when `def/2` and `defp/2` called outside a module
+
 ## v0.2.1 (2022-03-19)
 
 ### Bug fixes

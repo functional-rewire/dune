@@ -40,6 +40,11 @@ defmodule Dune.Parser.CompileEnv do
     end
   end
 
+  def resolve_mfa(%__MODULE__{}, module, fun_name, arity)
+      when module in [Kernel, nil] and fun_name in [:def, :defp] and arity in [1, 2] do
+    :outside_module
+  end
+
   def resolve_mfa(env = %__MODULE__{}, module, fun_name, arity)
       when is_atom(module) and is_atom(fun_name) and is_integer(arity) do
     actual_module = resolve_module(module, fun_name, arity)
