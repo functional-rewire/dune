@@ -36,6 +36,12 @@ defmodule Dune.Opts do
   The evaluation process will still need to parse and execute the sanitized AST, so using
   too low limits here would leave only a small margin to actually run user code.
 
+  ### Other options
+
+  - `pretty`:
+    Use pretty printing when inspecting the result.
+    Should be a boolean. Defaults to `false`.
+
   ### Extra note about `atom_pool_size`
 
   Atoms are reused from one evaluation to the other so the total is not
@@ -59,7 +65,8 @@ defmodule Dune.Opts do
           allowlist: module,
           max_heap_size: pos_integer,
           max_reductions: pos_integer,
-          timeout: pos_integer
+          timeout: pos_integer,
+          pretty: boolean
         }
 
   defstruct atom_pool_size: 5000,
@@ -67,7 +74,8 @@ defmodule Dune.Opts do
             allowlist: Dune.Allowlist.Default,
             max_heap_size: 30_000,
             max_reductions: 30_000,
-            timeout: 50
+            timeout: 50,
+            pretty: false
 
   @doc """
   Validates untrusted options from a keyword or a map and returns a `Dune.Opts` struct.
@@ -75,7 +83,15 @@ defmodule Dune.Opts do
   ## Examples
 
       iex> Dune.Opts.validate!([])
-      %Dune.Opts{max_heap_size: 30_000, max_reductions: 30_000, timeout: 50}
+      %Dune.Opts{
+        allowlist: Dune.Allowlist.Default,
+        atom_pool_size: 5000,
+        max_heap_size: 30000,
+        max_length: 5000,
+        max_reductions: 30000,
+        pretty: false,
+        timeout: 50
+      }
 
       iex> Dune.Opts.validate!(atom_pool_size: 10)
       %Dune.Opts{atom_pool_size: 10, allowlist: Dune.Allowlist.Default}
@@ -103,6 +119,9 @@ defmodule Dune.Opts do
 
       iex> Dune.Opts.validate!(timeout: "55")
       ** (ArgumentError) timeout should be an integer > 0
+
+      iex> Dune.Opts.validate!(pretty: :maybe)
+      ** (ArgumentError) pretty should be a boolean
 
   """
   @spec validate!(Keyword.t() | map) :: t
@@ -136,6 +155,10 @@ defmodule Dune.Opts do
 
   defp do_validate(%{timeout: timeout}) when not (is_integer(timeout) and timeout > 0) do
     raise ArgumentError, message: "timeout should be an integer > 0"
+  end
+
+  defp do_validate(%{pretty: pretty}) when not is_boolean(pretty) do
+    raise ArgumentError, message: "pretty should be a boolean"
   end
 
   defp do_validate(opts = %{allowlist: allowlist}) do

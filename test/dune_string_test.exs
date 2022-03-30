@@ -276,6 +276,17 @@ defmodule DuneStringTest do
                stdio: ":foo9321\nfoo9321\n"
              } = ~E'io = IO; io.puts(io.inspect(:foo9321))'
     end
+
+    test "pretty option" do
+      raw_string =
+        "{'This line is really long, maybe we should break', [%{bar: 1, baz: 2}, %{bar: 55}]}"
+
+      with_break =
+        "{'This line is really long, maybe we should break',\n [%{bar: 1, baz: 2}, %{bar: 55}]}"
+
+      assert %Success{inspected: ^raw_string} = Dune.eval_string(raw_string)
+      assert %Success{inspected: ^with_break} = Dune.eval_string(raw_string, pretty: true)
+    end
   end
 
   describe "Dune restricted" do

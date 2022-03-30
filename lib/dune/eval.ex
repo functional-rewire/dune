@@ -42,7 +42,7 @@ defmodule Dune.Eval do
     result =
       Dune.Eval.Process.run(
         fn ->
-          safe_eval(ast, env, bindings)
+          safe_eval(ast, env, bindings, opts.pretty)
         end,
         opts
       )
@@ -50,35 +50,35 @@ defmodule Dune.Eval do
     AtomMapping.replace_in_result(atom_mapping, result)
   end
 
-  defp safe_eval(safe_ast, env, bindings) do
+  defp safe_eval(safe_ast, env, bindings, pretty) do
     try do
-      do_safe_eval(safe_ast, env, bindings)
+      do_safe_eval(safe_ast, env, bindings, pretty)
     catch
       failure = %Failure{} ->
         failure
     end
   end
 
-  defp do_safe_eval(safe_ast, env, nil) do
+  defp do_safe_eval(safe_ast, env, nil, pretty) do
     binding = [env__Dune__: env]
     {value, new_env, _new_bindings} = do_eval_quoted(safe_ast, binding)
 
     %Success{
       value: value,
-      # another important thing about inspect/1 is that it force-evalates
+      # another important thing about inspect is that it force-evaluates
       # potentially huge shared structs => OOM before sending
-      inspected: Shims.Kernel.safe_inspect(new_env, value),
+      inspected: Shims.Kernel.safe_inspect(new_env, value, pretty: pretty),
       stdio: ""
     }
   end
 
-  defp do_safe_eval(safe_ast, env, bindings) when is_list(bindings) do
+  defp do_safe_eval(safe_ast, env, bindings, pretty) when is_list(bindings) do
     binding = [env__Dune__: env] ++ bindings
     {value, new_env, new_bindings} = do_eval_quoted(safe_ast, binding)
 
     %Success{
       value: {value, new_env, new_bindings},
-      inspected: Shims.Kernel.safe_inspect(new_env, value),
+      inspected: Shims.Kernel.safe_inspect(new_env, value, pretty: pretty),
       stdio: ""
     }
   end

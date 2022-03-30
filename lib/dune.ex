@@ -62,7 +62,7 @@ defmodule Dune do
       iex> Dune.eval_string("some_variable = IO.inspect(:some_atom)")
       %Dune.Success{inspected: ":some_atom", stdio: ":some_atom\n", value: :a__Dune_atom_2__}
 
-  The `value` field shows the actual value, but `inspected` and `stdio` are safe to display to the user.
+  The `value` field shows the actual runtime value, but `inspected` and `stdio` are safe to display to the user.
 
   """
   @spec eval_string(String.t(), Keyword.t()) :: Success.t() | Failure.t()
@@ -119,6 +119,14 @@ defmodule Dune do
       iex> Dune.string_to_quoted("[invalid")
       %Dune.Failure{stdio: "", message: "missing terminator: ] (for \"[\" starting at line 1)", type: :parsing}
 
+  The `pretty` option can make the AST more readable by adding newlines to `inspected`:
+
+      iex> Dune.string_to_quoted("IO.puts('hello world')", pretty: true).inspected
+      "{{:., [line: 1], [{:__aliases__, [line: 1], [:IO]}, :puts]}, [line: 1],\n ['hello world']}"
+
+      iex> Dune.string_to_quoted("IO.puts('hello world')").inspected
+      "{{:., [line: 1], [{:__aliases__, [line: 1], [:IO]}, :puts]}, [line: 1], ['hello world']}"
+
   Since the code isn't executed, there is no allowlist restriction:
 
       iex> Dune.string_to_quoted("System.halt()")
@@ -128,7 +136,7 @@ defmodule Dune do
         value: {{:., [line: 1], [{:__aliases__, [line: 1], [:System]}, :halt]}, [line: 1], []}
       }
 
-  Atoms used during parsing and execution might be transformed to prevent atom leaks:
+  Atoms might be transformed during parsing to prevent atom leaks:
 
       iex> Dune.string_to_quoted("some_variable = :some_atom")
       %Dune.Success{
@@ -137,7 +145,7 @@ defmodule Dune do
         value: {:=, [line: 1], [{:a__Dune_atom_1__, [line: 1], nil}, :a__Dune_atom_2__]}
       }
 
-  The `value` field shows the actual value, but `inspected` is safe to display to the user.
+  The `value` field shows the actual runtime value, but `inspected` is safe to display to the user.
 
   """
   @spec string_to_quoted(String.t(), Keyword.t()) :: Success.t() | Failure.t()
