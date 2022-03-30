@@ -9,7 +9,7 @@ defmodule Dune.Parser do
            compile_env: Dune.Parser.CompileEnv.t()
          }
 
-  @spec parse_string(String.t(), Opts.t(), previous_session | nil) :: SafeAst.t()
+  @spec parse_string(String.t(), Opts.t(), previous_session | nil) :: SafeAst.t() | Failure.t()
   def parse_string(string, opts = %Opts{}, previous_session \\ nil) when is_binary(string) do
     compile_env = get_compile_env(opts, previous_session)
 

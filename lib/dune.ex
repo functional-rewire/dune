@@ -33,7 +33,7 @@ defmodule Dune do
   alias Dune.{Success, Failure, Parser, Eval}
 
   @doc ~S"""
-  Evaluates the string in the sandbox.
+  Evaluates the `string` in the sandbox.
 
   Available options are detailed in `Dune.Parser.Opts` (for parsing-time restrictions)
   and in `Dune.Eval.Opts` (for runtime restrictions).
@@ -77,7 +77,7 @@ defmodule Dune do
   end
 
   @doc ~S"""
-  Evalates the quoted ast in the sandbox.
+  Evaluates the quoted `ast` in the sandbox.
 
   Available options are detailed in `Dune.Parser.Opts` (for parsing-time restrictions)
   and in `Dune.Eval.Opts` (for runtime restrictions).
