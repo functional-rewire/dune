@@ -59,7 +59,8 @@ defmodule Dune.MixProject do
       main: "Dune",
       source_ref: "v#{@version}",
       source_url: @github_url,
-      homepage_url: @github_url
+      homepage_url: @github_url,
+      extras: ["README.md", "CHANGELOG.md", "LICENSE.md"]
     ]
   end
 end
