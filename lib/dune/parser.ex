@@ -1,8 +1,8 @@
 defmodule Dune.Parser do
   @moduledoc false
 
-  alias Dune.{AtomMapping, Success, Failure}
-  alias Dune.Parser.{Opts, CompileEnv, StringParser, Sanitizer, SafeAst, UnsafeAst}
+  alias Dune.{AtomMapping, Success, Failure, Opts}
+  alias Dune.Parser.{CompileEnv, StringParser, Sanitizer, SafeAst, UnsafeAst}
 
   @typep previous_session :: %{
            atom_mapping: AtomMapping.t(),

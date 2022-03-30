@@ -5,7 +5,11 @@
 ### Enhancements
 
 - Add `Dune.string_to_quoted/2` to make it possible to visualize AST
+- Merged parsing and eval options in a single `Dune.Opts` for simplicity
 - Better error message when `def/2` and `defp/2` called outside a module
+
+### Breaking changes
+- Removed Dune.Parser.Opts and Dune.Eval.Opts
 
 ## v0.2.1 (2022-03-19)
 

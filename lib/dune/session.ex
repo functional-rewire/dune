@@ -17,7 +17,7 @@ defmodule Dune.Session do
 
   """
 
-  alias Dune.{Allowlist, Eval, Parser, Success, Failure}
+  alias Dune.{Allowlist, Eval, Parser, Success, Failure, Opts}
 
   @opaque private_env :: Eval.Env.t()
   @opaque private_compile_env :: Parser.CompileEnv.t()
@@ -80,14 +80,13 @@ defmodule Dune.Session do
   """
   @spec eval_string(t, String.t(), keyword) :: t
   def eval_string(session = %__MODULE__{}, string, opts \\ []) do
-    parser_opts = Parser.Opts.validate!(opts)
-    eval_opts = Eval.Opts.validate!(opts)
+    opts = Opts.validate!(opts)
 
     parse_state = %{atom_mapping: session.env.atom_mapping, compile_env: session.compile_env}
-    parsed = Parser.parse_string(string, parser_opts, parse_state)
+    parsed = Parser.parse_string(string, opts, parse_state)
 
     parsed
-    |> Eval.run(eval_opts, session)
+    |> Eval.run(opts, session)
     |> add_result_to_session(session, parsed)
   end
 

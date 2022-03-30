@@ -1,8 +1,8 @@
 defmodule Dune.Eval do
   @moduledoc false
 
-  alias Dune.{AtomMapping, Success, Failure}
-  alias Dune.Eval.{Env, Opts}
+  alias Dune.{AtomMapping, Success, Failure, Opts}
+  alias Dune.Eval.Env
   alias Dune.Parser.SafeAst
   alias Dune.Shims
 

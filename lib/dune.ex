@@ -30,13 +30,12 @@ defmodule Dune do
 
   """
 
-  alias Dune.{Success, Failure, Parser, Eval}
+  alias Dune.{Success, Failure, Parser, Eval, Opts}
 
   @doc ~S"""
   Evaluates the `string` in the sandbox.
 
-  Available options are detailed in `Dune.Parser.Opts` (for parsing-time restrictions)
-  and in `Dune.Eval.Opts` (for runtime restrictions).
+  Available options are detailed in `Dune.Opts`.
 
   Returns a `Dune.Success` struct if the execution went successfully,
   a `Dune.Failure` else.
@@ -67,20 +66,18 @@ defmodule Dune do
 
   """
   @spec eval_string(String.t(), Keyword.t()) :: Success.t() | Failure.t()
-  def eval_string(string, opts \\ []) do
-    parser_opts = Parser.Opts.validate!(opts)
-    eval_opts = Eval.Opts.validate!(opts)
+  def eval_string(string, opts \\ []) when is_binary(string) do
+    opts = Opts.validate!(opts)
 
     string
-    |> Parser.parse_string(parser_opts)
-    |> Eval.run(eval_opts)
+    |> Parser.parse_string(opts)
+    |> Eval.run(opts)
   end
 
   @doc ~S"""
   Evaluates the quoted `ast` in the sandbox.
 
-  Available options are detailed in `Dune.Parser.Opts` (for parsing-time restrictions)
-  and in `Dune.Eval.Opts` (for runtime restrictions).
+  Available options are detailed in `Dune.Opts` (parsing restrictions have no effect)..
 
   Returns a `Dune.Success` struct if the execution went successfully,
   a `Dune.Failure` else.
@@ -99,18 +96,17 @@ defmodule Dune do
   """
   @spec eval_quoted(Macro.t(), Keyword.t()) :: Success.t() | Failure.t()
   def eval_quoted(ast, opts \\ []) do
-    parser_opts = Parser.Opts.validate!(opts)
-    eval_opts = Eval.Opts.validate!(opts)
+    opts = Opts.validate!(opts)
 
     ast
-    |> Parser.parse_quoted(parser_opts)
-    |> Eval.run(eval_opts)
+    |> Parser.parse_quoted(opts)
+    |> Eval.run(opts)
   end
 
   @doc ~S"""
   Returns the AST corresponding to the provided `string`, without leaking atoms.
 
-  Available options are detailed in `Dune.Parser.Opts`.
+  Available options are detailed in `Dune.Opts` (runtime restrictions have no effect).
 
   Returns a `Dune.Success` struct if the execution went successfully,
   a `Dune.Failure` else.
@@ -122,6 +118,15 @@ defmodule Dune do
 
       iex> Dune.string_to_quoted("[invalid")
       %Dune.Failure{stdio: "", message: "missing terminator: ] (for \"[\" starting at line 1)", type: :parsing}
+
+  Since the code isn't executed, there is no allowlist restriction:
+
+      iex> Dune.string_to_quoted("System.halt()")
+      %Dune.Success{
+        inspected: "{{:., [line: 1], [{:__aliases__, [line: 1], [:System]}, :halt]}, [line: 1], []}",
+        stdio: "",
+        value: {{:., [line: 1], [{:__aliases__, [line: 1], [:System]}, :halt]}, [line: 1], []}
+      }
 
   Atoms used during parsing and execution might be transformed to prevent atom leaks:
 
@@ -137,7 +142,7 @@ defmodule Dune do
   """
   @spec string_to_quoted(String.t(), Keyword.t()) :: Success.t() | Failure.t()
   def string_to_quoted(string, opts \\ []) when is_binary(string) do
-    opts = Parser.Opts.validate!(opts)
+    opts = Opts.validate!(opts)
     Parser.string_to_quoted(string, opts)
   end
 end

@@ -1,8 +1,8 @@
 defmodule Dune.Parser.StringParserTest do
   use ExUnit.Case, async: true
 
-  alias Dune.Parser.{StringParser, UnsafeAst, Opts}
-  alias Dune.AtomMapping
+  alias Dune.{AtomMapping, Opts}
+  alias Dune.Parser.{StringParser, UnsafeAst}
 
   describe "parse_string/2" do
     test "existing atoms" do

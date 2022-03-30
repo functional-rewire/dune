@@ -3,7 +3,7 @@ defmodule Dune.Eval.Process do
 
   alias Dune.Failure
 
-  def run(fun, opts = %Dune.Eval.Opts{}) when is_function(fun, 0) do
+  def run(fun, opts = %Dune.Opts{}) when is_function(fun, 0) do
     with_string_io(fn string_io ->
       do_run(fun, opts, string_io)
     end)

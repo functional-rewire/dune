@@ -1,8 +1,8 @@
 defmodule Dune.Parser.Sanitizer do
   @moduledoc false
 
-  alias Dune.{Failure, AtomMapping}
-  alias Dune.Parser.{CompileEnv, RealModule, UnsafeAst, SafeAst, Opts}
+  alias Dune.{Failure, AtomMapping, Opts}
+  alias Dune.Parser.{CompileEnv, RealModule, UnsafeAst, SafeAst}
 
   @env_variable_name :env__Dune__
 
