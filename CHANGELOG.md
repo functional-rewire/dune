@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- Add `Dune.string_to_quoted/2` to make it possible to visualize AST
 - Better error message when `def/2` and `defp/2` called outside a module
 
 ## v0.2.1 (2022-03-19)

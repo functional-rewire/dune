@@ -106,4 +106,38 @@ defmodule Dune do
     |> Parser.parse_quoted(parser_opts)
     |> Eval.run(eval_opts)
   end
+
+  @doc ~S"""
+  Returns the AST corresponding to the provided `string`, without leaking atoms.
+
+  Available options are detailed in `Dune.Parser.Opts`.
+
+  Returns a `Dune.Success` struct if the execution went successfully,
+  a `Dune.Failure` else.
+
+  ## Examples
+
+      iex> Dune.string_to_quoted("1 + 2")
+      %Dune.Success{inspected: "{:+, [line: 1], [1, 2]}", stdio: "", value: {:+, [line: 1], [1, 2]}}
+
+      iex> Dune.string_to_quoted("[invalid")
+      %Dune.Failure{stdio: "", message: "missing terminator: ] (for \"[\" starting at line 1)", type: :parsing}
+
+  Atoms used during parsing and execution might be transformed to prevent atom leaks:
+
+      iex> Dune.string_to_quoted("some_variable = :some_atom")
+      %Dune.Success{
+        inspected: "{:=, [line: 1], [{:some_variable, [line: 1], nil}, :some_atom]}",
+        stdio: "",
+        value: {:=, [line: 1], [{:a__Dune_atom_1__, [line: 1], nil}, :a__Dune_atom_2__]}
+      }
+
+  The `value` field shows the actual value, but `inspected` is safe to display to the user.
+
+  """
+  @spec string_to_quoted(String.t(), Keyword.t()) :: Success.t() | Failure.t()
+  def string_to_quoted(string, opts \\ []) when is_binary(string) do
+    opts = Parser.Opts.validate!(opts)
+    Parser.string_to_quoted(string, opts)
+  end
 end

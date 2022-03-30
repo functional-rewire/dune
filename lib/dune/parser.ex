@@ -1,7 +1,7 @@
 defmodule Dune.Parser do
   @moduledoc false
 
-  alias Dune.{AtomMapping, Failure}
+  alias Dune.{AtomMapping, Success, Failure}
   alias Dune.Parser.{Opts, CompileEnv, StringParser, Sanitizer, SafeAst, UnsafeAst}
 
   @typep previous_session :: %{
@@ -47,5 +47,19 @@ defmodule Dune.Parser do
 
   defp get_compile_env(opts, %{compile_env: compile_env}) do
     %{compile_env | allowlist: opts.allowlist}
+  end
+
+  @spec string_to_quoted(String.t(), Opts.t()) :: Success.t() | Failure.t()
+  def string_to_quoted(string, opts) do
+    with unsafe = %UnsafeAst{} <- StringParser.parse_string(string, opts, nil) do
+      inspected = inspect(unsafe.ast, pretty: true)
+      inspected = AtomMapping.replace_in_string(unsafe.atom_mapping, inspected)
+
+      %Success{
+        value: unsafe.ast,
+        inspected: inspected,
+        stdio: ""
+      }
+    end
   end
 end
