@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.2.2 (2022-04-05)
+
 ### Enhancements
 
 - Add `Dune.string_to_quoted/2` to make it possible to visualize AST
