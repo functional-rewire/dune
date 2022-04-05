@@ -62,6 +62,13 @@ iex> Dune.Session.new()
 #Dune.Session<last_result: %Dune.Success{inspected: "3", stdio: "", value: 3}, ...>
 ```
 
+`Dune.string_to_quoted/2` returns the AST corresponding to the provided `string`, without leaking atoms:
+
+```elixir
+iex> Dune.string_to_quoted("foo(:bar)").inspected
+"{:foo, [line: 1], [:bar]}"
+```
+
 ## Limitations
 
 `Dune` supports a fair subset of the base language, but it cannot safely support
