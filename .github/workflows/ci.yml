@@ -10,6 +10,8 @@ jobs:
         include:
           - elixir: 1.13.0
             otp: 24.0.2
+          - elixir: 1.13.4
+            otp: 24.0.2
     steps:
       - uses: actions/checkout@v2
       - uses: erlef/setup-beam@v1
