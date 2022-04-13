@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.2.3 (2022-04-13)
+
 ### Bug fixes
 
 - `Dune.string_to_quoted/2` quotes modules with `.` correctly
