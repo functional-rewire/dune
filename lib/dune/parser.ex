@@ -51,7 +51,7 @@ defmodule Dune.Parser do
 
   @spec string_to_quoted(String.t(), Opts.t()) :: Success.t() | Failure.t()
   def string_to_quoted(string, opts) do
-    with unsafe = %UnsafeAst{} <- StringParser.parse_string(string, opts, nil) do
+    with unsafe = %UnsafeAst{} <- StringParser.parse_string(string, opts, nil, false) do
       inspected = inspect(unsafe.ast, pretty: opts.pretty)
       inspected = AtomMapping.replace_in_string(unsafe.atom_mapping, inspected)
 

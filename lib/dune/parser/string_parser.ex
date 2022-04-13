@@ -7,20 +7,27 @@ defmodule Dune.Parser.StringParser do
   @typep previous_session :: %{atom_mapping: AtomMapping.t()}
 
   # TODO options: parse timeout & max atoms
-  @spec parse_string(String.t(), Opts.t(), previous_session | nil) :: UnsafeAst.t() | Failure.t()
-  def parse_string(string, opts, previous_session) do
+  @spec parse_string(String.t(), Opts.t(), previous_session | nil, boolean) ::
+          UnsafeAst.t() | Failure.t()
+  def parse_string(string, opts, previous_session, encode_modules? \\ true)
+      when is_binary(string) and is_boolean(encode_modules?) do
     # import: do in a different process because the AtomEncoder pollutes the Process dict
-    fn -> do_parse_string(string, opts, previous_session) end
+    fn -> do_parse_string(string, opts, previous_session, encode_modules?) end
     |> Task.async()
     |> Task.await()
   end
 
-  defp do_parse_string(string, %Opts{atom_pool_size: pool_size}, previous_session) do
+  defp do_parse_string(
+         string,
+         %Opts{atom_pool_size: pool_size},
+         previous_session,
+         encode_modules?
+       ) do
     maybe_load_atom_mapping(previous_session)
     encoder = fn binary, _ctx -> AtomEncoder.static_atoms_encoder(binary, pool_size) end
 
     case Code.string_to_quoted(string, static_atoms_encoder: encoder, existing_atoms_only: true) do
-      {:ok, ast} -> encode_modules(ast, previous_session)
+      {:ok, ast} -> maybe_encode_modules(ast, previous_session, encode_modules?)
       {:error, {_ctx, error, token}} -> handle_failure(error, token)
     end
   end
@@ -31,12 +38,16 @@ defmodule Dune.Parser.StringParser do
     AtomEncoder.load_atom_mapping(atom_mapping)
   end
 
-  defp encode_modules(ast, previous_session) do
+  defp maybe_encode_modules(ast, previous_session, encode_modules?) do
     plain_atom_mapping = AtomEncoder.plain_atom_mapping()
-    existing_mapping = previous_session[:atom_mapping]
 
     {new_ast, atom_mapping} =
-      AtomEncoder.encode_modules(ast, plain_atom_mapping, existing_mapping)
+      if encode_modules? do
+        existing_mapping = previous_session[:atom_mapping]
+        AtomEncoder.encode_modules(ast, plain_atom_mapping, existing_mapping)
+      else
+        {ast, plain_atom_mapping}
+      end
 
     %UnsafeAst{ast: new_ast, atom_mapping: atom_mapping}
   end
