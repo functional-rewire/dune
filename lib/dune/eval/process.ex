@@ -124,7 +124,7 @@ defmodule Dune.Eval.Process do
 
     parts =
       case head do
-        {:erl_eval, :do_apply, 6, _} -> 3
+        {:erl_eval, :do_apply, _, _} -> 3
         _ -> 2
       end
 

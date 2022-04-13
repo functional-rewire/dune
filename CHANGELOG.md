@@ -5,6 +5,7 @@
 ### Bug fixes
 
 - `Dune.string_to_quoted/2` quotes modules with `.` correctly
+- OTP 25 regression: keep a clean stacktrace for exceptions
 
 ## v0.2.2 (2022-04-05)
 
