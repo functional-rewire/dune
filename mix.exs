@@ -50,7 +50,7 @@ defmodule Dune.MixProject do
       maintainers: ["functional-rewire", "sabiwara"],
       licenses: ["MIT"],
       links: %{"GitHub" => @github_url},
-      files: ~w(lib mix.exs README.md LICENSE.md CHANGELOG.md)
+      files: ~w(lib mix.exs .formatter.exs README.md LICENSE.md CHANGELOG.md)
     ]
   end
 
