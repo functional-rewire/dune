@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.2.4 (2022-07-13)
+
 ### Bug fixes
 
 - Validate module names in `defmodule`, reject `nil` or booleans
