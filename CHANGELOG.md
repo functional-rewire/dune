@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Bug fixes
+
+- Validate module names in `defmodule`, reject `nil` or booleans
+
 ## v0.2.3 (2022-04-13)
 
 ### Bug fixes
@@ -19,6 +23,7 @@
 - Better error message when `def/2` and `defp/2` called outside a module
 
 ### Breaking changes
+
 - Removed Dune.Parser.Opts and Dune.Eval.Opts
 
 ## v0.2.1 (2022-03-19)

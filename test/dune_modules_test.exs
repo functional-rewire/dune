@@ -381,5 +381,31 @@ defmodule DuneModulesTest do
              end
              '''
     end
+
+    test "defmodule with invalid module names" do
+      assert %Failure{
+               type: :exception,
+               message: "** (Dune.Eval.CompileError) nofile:1: invalid module name: true"
+             } = ~E'''
+             defmodule true do
+             end
+             '''
+
+      assert %Failure{
+               type: :exception,
+               message: "** (Dune.Eval.CompileError) nofile:1: invalid module name: nil"
+             } = ~E'''
+             defmodule nil do
+             end
+             '''
+
+      assert %Failure{
+               type: :exception,
+               message: "** (Dune.Eval.CompileError) nofile:1: invalid module name: 1"
+             } = ~E'''
+             defmodule 1 do
+             end
+             '''
+    end
   end
 end

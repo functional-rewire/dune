@@ -32,6 +32,13 @@ defmodule Dune.Parser.Sanitizer do
         message = "** (ArgumentError) cannot invoke #{def_or_defp}/2 inside function/macro"
         new_failure(:exception, message, unsafe.atom_mapping)
 
+      {:module_invalid, module_ast, error_ctx} ->
+        line = Keyword.get(error_ctx, :line)
+        name = Macro.to_string(module_ast)
+        message = "** (Dune.Eval.CompileError) nofile:#{line}: invalid module name: #{name}"
+
+        new_failure(:exception, message, unsafe.atom_mapping)
+
       {:module_restricted, ast} ->
         message =
           "** (DuneRestrictedError) the following syntax is restricted inside defmodule:\n         #{Macro.to_string(ast)}"
@@ -139,24 +146,27 @@ defmodule Dune.Parser.Sanitizer do
   defp defmodule_block?({:defmodule, _, _}), do: true
   defp defmodule_block?(_), do: false
 
-  defp parse_module_definition(
-         {:defmodule, _,
-          [
-            {:__aliases__, _, [_module_atom]} = module_def,
-            [do: do_ast]
-          ]}
-       ) do
-    module_name = Macro.expand_once(module_def, __ENV__)
-    do_parse_module_definition(module_name, do_ast)
-  end
-
-  defp parse_module_definition({:defmodule, _, [module_name, [do: do_ast]]})
-       when is_atom(module_name) do
-    do_parse_module_definition(module_name, do_ast)
+  defp parse_module_definition({:defmodule, ctx, [module_name, [do: do_ast]]}) do
+    module_name
+    |> validate_module_name(ctx)
+    |> do_parse_module_definition(do_ast)
   end
 
   defp parse_module_definition(ast = {:defmodule, _, _}) do
     throw({:parsing_error, ast})
+  end
+
+  defp validate_module_name(module, _ctx)
+       when is_atom(module) and module not in [nil, false, true] do
+    module
+  end
+
+  defp validate_module_name(module_def = {:__aliases__, _, [_module_atom]}, _ctx) do
+    Macro.expand_once(module_def, __ENV__)
+  end
+
+  defp validate_module_name(module_ast, ctx) do
+    throw({:module_invalid, module_ast, ctx})
   end
 
   defp do_parse_module_definition(module_name, do_ast) do
