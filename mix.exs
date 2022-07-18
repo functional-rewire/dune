@@ -12,6 +12,7 @@ defmodule Dune.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       preferred_cli_env: preferred_cli_env(),
+      dialyzer: [flags: [:missing_return, :extra_return]],
 
       # Hex
       description: "A sandbox for Elixir to safely evaluate untrusted code from user input",

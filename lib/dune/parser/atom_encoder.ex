@@ -218,7 +218,7 @@ defmodule Dune.Parser.AtomEncoder do
   defp encode_many_atoms([head | tail], pool_size, acc) do
     case do_static_atoms_encoder(head, :alias, pool_size) do
       {:ok, atom} -> encode_many_atoms(tail, pool_size, [atom | acc])
-      {:error, error} -> error
+      {:error, error} -> {:error, error}
     end
   end
 
