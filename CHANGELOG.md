@@ -2,6 +2,11 @@
 
 ## Dev
 
+### Bug fixes
+
+- Restrict the use of `:counters` in `Dune.Allowlist.Default`, since it can leak
+  memory
+
 ## v0.2.4 (2022-07-13)
 
 ### Bug fixes

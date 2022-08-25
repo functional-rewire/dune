@@ -338,7 +338,6 @@ defmodule Dune.Allowlist.Default do
   allow :string, :all
   allow :unicode, :all
   allow :rand, :all
-  allow :counters, :all
   allow :erts_debug, only: ~w[same size size_shared flat_size]a
   allow :zlib, only: ~w[zip unzip gzip gunzip compress uncompress]a
 end
