@@ -69,13 +69,13 @@ defmodule Dune.Session do
       iex> Dune.Session.new()
       ...> |> Dune.Session.eval_string("x = 1")
       ...> |> Dune.Session.eval_string("x + 2")
-      #Dune.Session<last_result: %Dune.Success{inspected: "3", stdio: "", value: 3}, ...>
+      #Dune.Session<last_result: %Dune.Success{value: 3, inspected: "3", stdio: ""}, ...>
 
       iex> Dune.Session.new()
       ...> |> Dune.Session.eval_string("x = 1")
       ...> |> Dune.Session.eval_string("x = x / 0")  # will fail, but the previous state is kept
       ...> |> Dune.Session.eval_string("x + 2")
-      #Dune.Session<last_result: %Dune.Success{inspected: "3", stdio: "", value: 3}, ...>
+      #Dune.Session<last_result: %Dune.Success{value: 3, inspected: "3", stdio: ""}, ...>
 
   """
   @spec eval_string(t, String.t(), keyword) :: t
@@ -116,8 +116,14 @@ defmodule Dune.Session do
     end
 
     defp do_inspect({key, value}, opts) do
-      key = color(Code.Identifier.inspect_as_key(key), :atom, opts)
+      key = inspect_as_key(key) |> color(:atom, opts)
       concat(key, concat(" ", to_doc(value, opts)))
+    end
+
+    if function_exported?(Macro, :inspect_atom, 2) do
+      defp inspect_as_key(key), do: Macro.inspect_atom(:key, key)
+    else
+      defp inspect_as_key(key), do: Code.Identifier.inspect_as_key(key)
     end
   end
 end

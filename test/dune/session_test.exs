@@ -1,6 +1,7 @@
 defmodule Dune.SessionTest do
   use ExUnit.Case
-  doctest Dune.Session
+
+  doctest Dune.Session, tags: [lts_only: true]
 
   alias Dune.{Session, Success, Failure}
 
