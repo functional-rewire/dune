@@ -69,6 +69,12 @@ defmodule DuneQuotedTest do
     end
 
     test "dynamic module names (authorized functions)" do
+      assert %Success{value: %{}} =
+               (dune do
+                  module = Map
+                  module.new()
+                end)
+
       assert %Success{value: [%{}, %MapSet{}]} =
                (dune do
                   Enum.map([Map, MapSet], fn module -> module.new end)

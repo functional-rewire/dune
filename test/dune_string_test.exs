@@ -69,13 +69,14 @@ defmodule DuneStringTest do
                 '
     end
 
-    @tag :lts_only
     test "dynamic module names (authorized functions)" do
-      assert %Success{value: [%{}, %MapSet{}], inspected: ~S'[%{}, MapSet.new([])]'} =
-               ~E'Enum.map([Map, MapSet], fn module -> module.new end)'
+      assert %Success{value: %{}, inspected: ~S'%{}'} = ~E'module = Map; module.new()'
 
-      assert %Success{value: [%{}, %MapSet{}], inspected: ~S'[%{}, MapSet.new([])]'} =
-               ~E'Enum.map([Map, MapSet], fn module -> module.new() end)'
+      assert %Success{value: [%{}], inspected: ~S'[%{}]'} =
+               ~E'Enum.map([Map], fn module -> module.new end)'
+
+      assert %Success{value: [%{}], inspected: ~S'[%{}]'} =
+               ~E'Enum.map([Map], fn module -> module.new() end)'
 
       assert %Success{value: 3, inspected: ~S'3'} = ~E'apply(List, :last, [[1, 2, 3]])'
     end
