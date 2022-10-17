@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.2.6 (2022-10-17)
+
 ### Enhancements
 
 - Support Elixir 1.14
