@@ -27,9 +27,11 @@ defmodule Dune.Eval.Env do
 
   def apply_fake(env = %__MODULE__{}, module, fun_name, args)
       when is_atom(module) and is_atom(fun_name) and is_list(args) do
-    case fetch_fake_function(env, module, fun_name, length(args)) do
+    arity = length(args)
+
+    case fetch_fake_function(env, module, fun_name, arity) do
       {:def, fun} -> fun.(env, args)
-      other -> throw(other)
+      other -> throw({other, module, fun_name, arity})
     end
   end
 

@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Bug fixes
+
+- Better handle `UndefinedFunctionError` for dynamic module names
+
 ## v0.2.6 (2022-10-17)
 
 ### Enhancements

@@ -116,7 +116,11 @@ defmodule Dune.Eval.Process do
   defp format_error(error, stacktrace)
 
   defp format_error({:nocatch, value}, _stacktrace) do
-    %Failure{type: :throw, message: "** (throw) " <> inspect(value)}
+    case value do
+      {:undefined_module, module, fun, arity} -> Failure.undefined_module(module, fun, arity)
+      {:undefined_function, module, fun, arity} -> Failure.undefined_function(module, fun, arity)
+      _ -> %Failure{type: :throw, message: "** (throw) " <> inspect(value)}
+    end
   end
 
   defp format_error(error, stacktrace) do

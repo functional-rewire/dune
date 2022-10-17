@@ -53,6 +53,12 @@ defmodule Dune.Shims.Kernel do
       :allowed ->
         apply(module, fun, args)
 
+      :undefined_module ->
+        Dune.Eval.Env.apply_fake(env, module, fun, args)
+
+      :undefined_function ->
+        throw({:undefined_function, module, fun, arity})
+
       other when other in [:undefined_module, :undefined_function] ->
         Dune.Eval.Env.apply_fake(env, module, fun, args)
     end

@@ -368,6 +368,17 @@ defmodule DuneStringTest do
     test ". operator various failures" do
       assert %Failure{
                type: :exception,
+               message:
+                 "** (UndefinedFunctionError) function :foo.bar/0 is undefined (module :foo is not available)"
+             } = ~E'module = :foo; module.bar()'
+
+      assert %Failure{
+               type: :exception,
+               message: "** (UndefinedFunctionError) function List.bar/0 is undefined or private"
+             } = ~E'module = List; module.bar()'
+
+      assert %Failure{
+               type: :exception,
                message: "** (KeyError) key :job not found in: %{age: 100}\n" <> _
              } = ~E'users = [john: %{age: 100}]; users[:john].job'
 
