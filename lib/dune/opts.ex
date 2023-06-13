@@ -72,7 +72,7 @@ defmodule Dune.Opts do
   defstruct atom_pool_size: 5000,
             max_length: 5000,
             allowlist: Dune.Allowlist.Default,
-            max_heap_size: 30_000,
+            max_heap_size: 50_000,
             max_reductions: 30_000,
             timeout: 50,
             pretty: false
@@ -86,7 +86,7 @@ defmodule Dune.Opts do
       %Dune.Opts{
         allowlist: Dune.Allowlist.Default,
         atom_pool_size: 5000,
-        max_heap_size: 30000,
+        max_heap_size: 50000,
         max_length: 5000,
         max_reductions: 30000,
         pretty: false,

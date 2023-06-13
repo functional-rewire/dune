@@ -319,7 +319,7 @@ defmodule DuneQuotedTest do
 
     test "returns a big binary" do
       assert %Failure{message: "Execution stopped - " <> _} =
-               dune(do: String.duplicate("foo", 100_000))
+               dune(do: String.duplicate("foo", 200_000))
     end
   end
 

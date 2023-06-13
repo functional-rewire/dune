@@ -6,7 +6,7 @@ defmodule DuneModulesTest do
   defmacro sigil_E(call, _expr) do
     # TODO fix memory needs
     quote do
-      Dune.eval_string(unquote(call), max_reductions: 25_000, max_heap_size: 30_000)
+      Dune.eval_string(unquote(call), max_reductions: 25_000, max_heap_size: 50_000)
     end
   end
 
