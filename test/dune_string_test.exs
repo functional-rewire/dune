@@ -208,10 +208,10 @@ defmodule DuneStringTest do
                value: [
                  Dune_Module_1__,
                  {:a__Dune_atom_2__, :Dune_Atom_1__},
-                 %{Dune_Atom_1__: 6, a__Dune_atom_2__: 15, __Dune_atom_3__: 33}
+                 [a__Dune_atom_2__: 15, Dune_Atom_1__: 6, __Dune_atom_3__: 33]
                ],
-               inspected: ~s([Foo91, {:foo91, :Foo91}, %{Foo91: 6, _foo92: 33, foo91: 15}])
-             } = ~E'[Foo91, {:foo91, :Foo91}, %{foo91: 15, Foo91: 6, _foo92: 33}]'
+               inspected: ~s([Foo91, {:foo91, :Foo91}, [foo91: 15, Foo91: 6, _foo92: 33]])
+             } = ~E'[Foo91, {:foo91, :Foo91}, [foo91: 15, Foo91: 6, _foo92: 33]]'
     end
 
     test "atoms (prefixed by Elixir)" do

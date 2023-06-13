@@ -14,6 +14,9 @@ jobs:
           - elixir: "1.14.1"
             otp: "25.3"
             testArgs: ""
+          - elixir: "1.14.5"
+            otp: "26.0"
+            testArgs: ""
     steps:
       - uses: actions/checkout@v2
       - uses: erlef/setup-beam@v1
