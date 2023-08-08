@@ -50,7 +50,7 @@ defmodule DuneQuotedTest do
     test "tuples" do
       assert %Success{value: {}} = dune(do: {})
       assert %Success{value: {:foo}} = dune(do: {:foo})
-      assert %Success{value: {"hello", 'world'}} = dune(do: {"hello", 'world'})
+      assert %Success{value: {"hello", ~c"world"}} = dune(do: {"hello", ~c"world"})
       assert %Success{value: {1, 2, 3}} = dune(do: {1, 2, 3})
     end
 
@@ -106,9 +106,9 @@ defmodule DuneQuotedTest do
     test "sigils" do
       assert %Success{value: ~r/(a|b)?c/} = dune(do: ~r/(a|b)?c/)
       assert %Success{value: ~U[2021-05-20 01:02:03Z]} = dune(do: ~U[2021-05-20 01:02:03Z])
-      assert %Success{value: ['foo', 'bar', 'baz']} = dune(do: ~W[foo bar baz]c)
+      assert %Success{value: [~c"foo", ~c"bar", ~c"baz"]} = dune(do: ~W[foo bar baz]c)
 
-      assert %Success{value: ['foo', 'bar', 'baz']} =
+      assert %Success{value: [~c"foo", ~c"bar", ~c"baz"]} =
                dune(do: ~w[#{String.downcase("FOO")} bar baz]c)
 
       assert %Dune.Failure{
@@ -197,7 +197,7 @@ defmodule DuneQuotedTest do
       assert %Failure{
                type: :restricted,
                message: "** (DuneRestrictedError) function List.to_atom/1 is restricted"
-             } = dune(do: List.to_atom('foo'))
+             } = dune(do: List.to_atom(~c"foo"))
 
       assert %Failure{
                type: :restricted,
@@ -208,7 +208,7 @@ defmodule DuneQuotedTest do
       assert %Failure{
                type: :restricted,
                message: "** (DuneRestrictedError) function List.to_existing_atom/1 is restricted"
-             } = dune(do: List.to_existing_atom('foo'))
+             } = dune(do: List.to_existing_atom(~c"foo"))
     end
 
     test "atom interpolation" do
@@ -327,9 +327,10 @@ defmodule DuneQuotedTest do
     test "math error" do
       assert %Failure{
                type: :exception,
-               message:
-                 "** (ArithmeticError) bad argument in arithmetic expression\n        :erlang./(42, 0)"
+               message: "** (ArithmeticError) bad argument in arithmetic expression\n" <> rest
              } = dune(do: 42 / 0)
+
+      assert rest =~ ":erlang./(42, 0)"
     end
 
     test "throw" do

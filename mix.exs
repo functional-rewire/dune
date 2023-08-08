@@ -8,7 +8,7 @@ defmodule Dune.MixProject do
     [
       app: :dune,
       version: @version,
-      elixir: ">= 1.13.0 and < 1.15.0",
+      elixir: ">= 1.14.0 and < 1.16.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       preferred_cli_env: preferred_cli_env(),

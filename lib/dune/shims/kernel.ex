@@ -3,7 +3,7 @@ defmodule Dune.Shims.Kernel do
 
   alias Dune.{AtomMapping, Failure, Shims}
 
-  defmacro safe_sigil_w(_env, _, 'a') do
+  defmacro safe_sigil_w(_env, _, ~c"a") do
     error = Failure.restricted_function(Kernel, :sigil_w, 2)
     throw(error)
   end
@@ -14,7 +14,7 @@ defmodule Dune.Shims.Kernel do
     end
   end
 
-  defmacro safe_sigil_W(_env, _, 'a') do
+  defmacro safe_sigil_W(_env, _, ~c"a") do
     error = Failure.restricted_function(Kernel, :sigil_W, 2)
     throw(error)
   end

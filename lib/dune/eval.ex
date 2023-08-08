@@ -3,16 +3,9 @@ defmodule Dune.Eval do
 
   alias Dune.{AtomMapping, Success, Failure, Opts}
   alias Dune.Eval.Env
+  alias Dune.Eval.MacroEnv
   alias Dune.Parser.SafeAst
   alias Dune.Shims
-
-  @eval_env [
-    requires: [Kernel, Dune.Shims.Kernel],
-    macros: [
-      {Kernel, Kernel.__info__(:macros)},
-      {Dune.Shims.Kernel, [safe_sigil_w: 3, safe_sigil_W: 3]}
-    ]
-  ]
 
   @typep previous_session :: %{:bindings => keyword, :env => Env.t(), optional(any) => any}
 
@@ -50,18 +43,35 @@ defmodule Dune.Eval do
     AtomMapping.replace_in_result(atom_mapping, result)
   end
 
-  defp safe_eval(safe_ast, env, bindings, pretty) do
-    try do
-      do_safe_eval(safe_ast, env, bindings, pretty)
-    catch
-      failure = %Failure{} ->
-        failure
+  if System.version() |> Version.compare("1.15.0") != :lt do
+    defp safe_eval(safe_ast, env, bindings, pretty) do
+      {result, all_errors_and_warnings} =
+        Code.with_diagnostics(fn ->
+          try do
+            do_safe_eval(safe_ast, env, bindings, pretty)
+          catch
+            failure = %Failure{} ->
+              failure
+          end
+        end)
+
+      [] = all_errors_and_warnings
+      result
+    end
+  else
+    defp safe_eval(safe_ast, env, bindings, pretty) do
+      try do
+        do_safe_eval(safe_ast, env, bindings, pretty)
+      catch
+        failure = %Failure{} ->
+          failure
+      end
     end
   end
 
   defp do_safe_eval(safe_ast, env, nil, pretty) do
     binding = [env__Dune__: env]
-    {value, new_env, _new_bindings} = do_eval_quoted(safe_ast, binding)
+    {value, new_env, _new_bindings} = eval_quoted(safe_ast, binding)
 
     %Success{
       value: value,
@@ -74,7 +84,7 @@ defmodule Dune.Eval do
 
   defp do_safe_eval(safe_ast, env, bindings, pretty) when is_list(bindings) do
     binding = [env__Dune__: env] ++ bindings
-    {value, new_env, new_bindings} = do_eval_quoted(safe_ast, binding)
+    {value, new_env, new_bindings} = eval_quoted(safe_ast, binding)
 
     %Success{
       value: {value, new_env, new_bindings},
@@ -83,8 +93,8 @@ defmodule Dune.Eval do
     }
   end
 
-  defp do_eval_quoted(safe_ast, binding) do
-    {value, bindings} = Code.eval_quoted(safe_ast, binding, @eval_env)
+  defp eval_quoted(safe_ast, binding) do
+    {value, bindings, _env} = Code.eval_quoted_with_env(safe_ast, binding, MacroEnv.make_env())
 
     {new_env, new_bindings} = Keyword.pop!(bindings, :env__Dune__)
 

@@ -2,6 +2,14 @@
 
 ## Dev
 
+### Breaking changes
+
+- Drop support for Elixir 1.13
+
+### Enhancements
+
+- Support Elixir 1.15
+
 ### Bug fixes
 
 - Better handle `UndefinedFunctionError` for dynamic module names

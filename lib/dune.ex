@@ -121,11 +121,11 @@ defmodule Dune do
 
   The `pretty` option can make the AST more readable by adding newlines to `inspected`:
 
-      iex> Dune.string_to_quoted("IO.puts('hello world')", pretty: true).inspected
-      "{{:., [line: 1], [{:__aliases__, [line: 1], [:IO]}, :puts]}, [line: 1],\n ['hello world']}"
+      iex> Dune.string_to_quoted("IO.puts(:hello)", pretty: true).inspected
+      "{{:., [line: 1], [{:__aliases__, [line: 1], [:IO]}, :puts]}, [line: 1],\n [:hello]}"
 
-      iex> Dune.string_to_quoted("IO.puts('hello world')").inspected
-      "{{:., [line: 1], [{:__aliases__, [line: 1], [:IO]}, :puts]}, [line: 1], ['hello world']}"
+      iex> Dune.string_to_quoted("IO.puts(:hello)").inspected
+      "{{:., [line: 1], [{:__aliases__, [line: 1], [:IO]}, :puts]}, [line: 1], [:hello]}"
 
   Since the code isn't executed, there is no allowlist restriction:
 

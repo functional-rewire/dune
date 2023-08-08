@@ -44,11 +44,12 @@ defmodule DuneStringTest do
       assert %Success{value: 3.141592653589793, inspected: ~S'3.141592653589793'} = ~E':math.pi()'
     end
 
+    @tag :lts_only
     test "tuples" do
       assert %Success{value: {}, inspected: ~S'{}'} = ~E'{}'
       assert %Success{value: {:foo}, inspected: ~S'{:foo}'} = ~E'{:foo}'
 
-      assert %Success{value: {"hello", 'world'}, inspected: ~S/{"hello", 'world'}/} =
+      assert %Success{value: {"hello", ~c"world"}, inspected: ~S/{"hello", ~c"world"}/} =
                ~E/{"hello", 'world'}/
 
       assert %Success{value: {1, 2, 3}, inspected: ~S'{1, 2, 3}'} = ~E'{1, 2, 3}'
@@ -112,17 +113,22 @@ defmodule DuneStringTest do
       assert %Success{value: 0.2, inspected: ~S'0.2'} = ~E'(& &2 / &1).(10, 2)'
     end
 
+    @tag :lts_only
     test "sigils" do
       assert %Success{value: ~r/(a|b)?c/, inspected: ~S'~r/(a|b)?c/'} = ~E'~r/(a|b)?c/'
 
       assert %Success{value: ~U[2021-05-20 01:02:03Z], inspected: ~S'~U[2021-05-20 01:02:03Z]'} =
                ~E'~U[2021-05-20 01:02:03Z]'
 
-      assert %Success{value: ['foo', 'bar', 'baz'], inspected: "['foo', 'bar', 'baz']"} =
-               ~E'~W[foo bar baz]c'
+      assert %Success{
+               value: [~c"foo", ~c"bar", ~c"baz"],
+               inspected: ~S'[~c"foo", ~c"bar", ~c"baz"]'
+             } = ~E'~W[foo bar baz]c'
 
-      assert %Success{value: ['foo', 'bar', 'baz'], inspected: "['foo', 'bar', 'baz']"} =
-               ~E'~w[#{String.downcase("FOO")} bar baz]c'
+      assert %Success{
+               value: [~c"foo", ~c"bar", ~c"baz"],
+               inspected: ~S'[~c"foo", ~c"bar", ~c"baz"]'
+             } = ~E'~w[#{String.downcase("FOO")} bar baz]c'
 
       assert %Dune.Failure{
                message: "** (DuneRestrictedError) function sigil_W/2 is restricted",
@@ -184,8 +190,6 @@ defmodule DuneStringTest do
       assert %Success{value: "Hello boo58", inspected: ~s'"Hello boo58"'} =
                ~E'"Hello #{:foo58}" |> String.replace("f", "b")'
 
-      assert %Success{value: 'Hello foo59', inspected: "'Hello foo59'"} = ~E'~c"Hello #{:foo59}"'
-
       assert %Success{value: :Dune_Atom_1__, inspected: ~s':Foo12'} = ~E':Foo12'
       assert %Success{value: Dune_Module_1__, inspected: ~s'Foo13'} = ~E'Foo13'
 
@@ -193,9 +197,6 @@ defmodule DuneStringTest do
 
       assert %Success{value: "Elixir.Foo15", inspected: ~s("Elixir.Foo15")} =
                ~E'Atom.to_string(Foo15)'
-
-      assert %Success{value: 'Elixir.Foo15', inspected: ~s('Elixir.Foo15')} =
-               ~E'Atom.to_charlist(Foo15)'
 
       assert %Success{value: ":Foo16", inspected: ~s'":Foo16"'} = ~E'inspect(:Foo16)'
 
@@ -212,6 +213,15 @@ defmodule DuneStringTest do
                ],
                inspected: ~s([Foo91, {:foo91, :Foo91}, [foo91: 15, Foo91: 6, _foo92: 33]])
              } = ~E'[Foo91, {:foo91, :Foo91}, [foo91: 15, Foo91: 6, _foo92: 33]]'
+    end
+
+    @tag :lts_only
+    test "atoms to charlist" do
+      assert %Success{value: ~c"Hello foo59", inspected: ~s'~c"Hello foo59"'} =
+               ~E'~c"Hello #{:foo59}"'
+
+      assert %Success{value: ~c"Elixir.Foo15", inspected: ~s(~c"Elixir.Foo15")} =
+               ~E'Atom.to_charlist(Foo15)'
     end
 
     test "atoms (prefixed by Elixir)" do
@@ -281,10 +291,10 @@ defmodule DuneStringTest do
 
     test "pretty option" do
       raw_string =
-        "{'This line is really long, maybe we should break', [%{bar: 1, baz: 2}, %{bar: 55}]}"
+        ~S'{"This line is really long, maybe we should break", [%{bar: 1, baz: 2}, %{bar: 55}]}'
 
       with_break =
-        "{'This line is really long, maybe we should break',\n [%{bar: 1, baz: 2}, %{bar: 55}]}"
+        ~s'{"This line is really long, maybe we should break",\n [%{bar: 1, baz: 2}, %{bar: 55}]}'
 
       assert %Success{inspected: ^raw_string} = Dune.eval_string(raw_string)
       assert %Success{inspected: ^with_break} = Dune.eval_string(raw_string, pretty: true)
@@ -621,9 +631,10 @@ defmodule DuneStringTest do
     test "math error" do
       assert %Failure{
                type: :exception,
-               message:
-                 "** (ArithmeticError) bad argument in arithmetic expression\n        :erlang./(42, 0)"
+               message: "** (ArithmeticError) bad argument in arithmetic expression\n" <> rest
              } = ~E'42 / 0'
+
+      assert rest =~ ":erlang./(42, 0)"
     end
 
     test "throw" do
@@ -703,11 +714,13 @@ defmodule DuneStringTest do
              } = ~E'a |> b'
     end
 
+    @tag :lts_only
     test "compile error" do
+      # TODO capture diagnostics
       assert %Failure{
                type: :exception,
                message:
-                 "** (CompileError) nofile:2: expected -> clauses for :do in \"case\"\n        (stdlib " <>
+                 "** (CompileError) nofile: cannot compile file (errors have been logged)" <>
                    _
              } = ~E'
                 case 1 do
