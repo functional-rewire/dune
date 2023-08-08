@@ -116,11 +116,19 @@ defmodule Dune.AtomMapping do
   def replace_in_result(mapping, result)
 
   def replace_in_result(mapping, %Success{} = success) do
-    %{success | inspected: replace_in_string(mapping, success.inspected)}
+    %Success{
+      success
+      | inspected: replace_in_string(mapping, success.inspected),
+        stdio: replace_in_string(mapping, success.stdio)
+    }
   end
 
   def replace_in_result(mapping, %Failure{} = error) do
-    %{error | message: replace_in_string(mapping, error.message)}
+    %Failure{
+      error
+      | message: replace_in_string(mapping, error.message),
+        stdio: replace_in_string(mapping, error.stdio)
+    }
   end
 
   @spec to_existing_atom(t, String.t()) :: atom

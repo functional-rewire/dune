@@ -5,10 +5,12 @@
 ### Breaking changes
 
 - Drop support for Elixir 1.13
+- Compile errors are now returned as a separate type `:compile_error`
 
 ### Enhancements
 
 - Support Elixir 1.15
+- Capture compile diagnostics (Elixir >= 1.15)
 
 ### Bug fixes
 

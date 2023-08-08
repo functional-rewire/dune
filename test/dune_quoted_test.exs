@@ -363,13 +363,23 @@ defmodule DuneQuotedTest do
              } = dune(do: :foo_bar.baz())
     end
 
+    @tag :lts_only
     test "undefined variable" do
       capture_io(:stderr, fn ->
         # TODO better error messages
-        assert %Failure{type: :exception, message: "** (CompileError) " <> _} = dune(do: y)
+        assert %Failure{
+                 type: :compile_error,
+                 message:
+                   "** (CompileError) nofile: cannot compile file (errors have been logged)",
+                 stdio: "error: undefined variable \"y\"\n" <> _
+               } = dune(do: y)
 
-        assert %Failure{type: :exception, message: "** (CompileError) " <> _} =
-                 dune(do: if(x, do: x))
+        assert %Failure{
+                 type: :compile_error,
+                 message:
+                   "** (CompileError) nofile: cannot compile file (errors have been logged)",
+                 stdio: "error: undefined variable \"x\"\n" <> _
+               } = dune(do: if(x, do: x))
       end)
     end
   end

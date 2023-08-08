@@ -15,6 +15,7 @@ defmodule Dune.Failure do
           | :module_conflict
           | :timeout
           | :exception
+          | :compile_error
           | :parsing
           | :memory
           | :reductions

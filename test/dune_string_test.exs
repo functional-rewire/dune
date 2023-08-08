@@ -716,16 +716,38 @@ defmodule DuneStringTest do
 
     @tag :lts_only
     test "compile error" do
-      # TODO capture diagnostics
       assert %Failure{
-               type: :exception,
-               message:
-                 "** (CompileError) nofile: cannot compile file (errors have been logged)" <>
-                   _
+               type: :compile_error,
+               message: "** (CompileError) nofile: cannot compile file (errors have been logged)",
+               stdio: "error: expected -> clauses for :do in \"case\"\n  nofile:2"
              } = ~E'
                 case 1 do
                 end
               '
+
+      assert %Failure{
+               type: :compile_error,
+               message: "** (CompileError) nofile: cannot compile file (errors have been logged)",
+               stdio: "error: undefined variable \"this_var_does_not_exist\"\n  nofile:1"
+             } = ~E'this_var_does_not_exist'
+    end
+
+    @tag :lts_only
+    test "warnings" do
+      assert %Success{value: 1, inspected: "1", stdio: stdio} = ~E'
+                f = fn ->
+                  IO.puts("hello")
+                  this_var_is_unused = 1
+                end
+                f.()
+              '
+
+      assert stdio == """
+             warning: variable \"this_var_is_unused\" is unused (if the variable is not meant to be used, prefix it with an underscore)
+               nofile:4
+
+             hello
+             """
     end
 
     test "def/defp outside of module" do

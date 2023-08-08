@@ -30,7 +30,10 @@ defmodule Dune.Eval.Process do
           %Failure{type: :timeout, message: "Execution timeout - #{opts.timeout}ms"}
       end
 
-    %{result | stdio: StringIO.flush(string_io)}
+    case result do
+      %Failure{type: :compile_error} -> result
+      _ -> %{result | stdio: result.stdio <> StringIO.flush(string_io)}
+    end
   end
 
   defp with_string_io(fun) do
@@ -64,8 +67,10 @@ defmodule Dune.Eval.Process do
       :proc_lib.spawn_opt(
         fn ->
           Process.group_leader(self(), string_io)
-          result = fun.()
-          send(report_to, {:ok, result})
+
+          fun
+          |> catch_diagnostics()
+          |> then(&send(report_to, &1))
         end,
         opts
       )
@@ -73,8 +78,11 @@ defmodule Dune.Eval.Process do
     spawn(fn -> check_max_reductions(pid, report_to, max_reductions) end)
 
     receive do
-      {:ok, result} ->
-        result
+      {:ok, result, diagnostics} ->
+        prepend_diagnostics(result, diagnostics)
+
+      {:compile_error, error, diagnostics, stacktrace} ->
+        format_compile_error(error, diagnostics, stacktrace)
 
       {:EXIT, ^pid, reason} ->
         case reason do
@@ -94,6 +102,37 @@ defmodule Dune.Eval.Process do
 
       {:reductions_exceeded, _reductions} ->
         %Failure{type: :reductions, message: "Execution stopped - reductions limit exceeded"}
+    end
+  end
+
+  if System.version() |> Version.compare("1.15.0") != :lt do
+    defp catch_diagnostics(fun) do
+      with_diagnostics =
+        Code.with_diagnostics(fn ->
+          try do
+            {:ok, fun.()}
+          rescue
+            err in CompileError ->
+              {err, __STACKTRACE__}
+          end
+        end)
+
+      case with_diagnostics do
+        {{:ok, result}, diagnostics} ->
+          {:ok, result, diagnostics}
+
+        {{%CompileError{} = err, stacktrace}, diagnostics} ->
+          {:compile_error, err, diagnostics, stacktrace}
+      end
+    end
+  else
+    defp catch_diagnostics(fun) do
+      try do
+        {:ok, fun.(), []}
+      rescue
+        err in CompileError ->
+          {:compile_error, err, [], __STACKTRACE__}
+      end
     end
   end
 
@@ -141,5 +180,33 @@ defmodule Dune.Eval.Process do
 
     # TODO properly pass stacktrace
     %Failure{type: :exception, message: message}
+  end
+
+  defp format_compile_error(error, diagnostics, stacktrace) do
+    message =
+      {error, stacktrace}
+      |> Exception.format_exit()
+      |> String.split("\n    ")
+      |> Enum.at(1)
+
+    %Failure{
+      type: :compile_error,
+      message: message,
+      stdio: format_diagnostics(diagnostics)
+    }
+  end
+
+  defp prepend_diagnostics(result, []), do: result
+
+  defp prepend_diagnostics(result, diagnostics) do
+    %{result | stdio: format_diagnostics(diagnostics) <> "\n\n"}
+  end
+
+  defp format_diagnostics(diagnostics) do
+    Enum.map_join(
+      diagnostics,
+      "\n",
+      &"#{&1.severity}: #{&1.message}\n  #{&1.file}:#{&1.position}"
+    )
   end
 end

@@ -43,29 +43,12 @@ defmodule Dune.Eval do
     AtomMapping.replace_in_result(atom_mapping, result)
   end
 
-  if System.version() |> Version.compare("1.15.0") != :lt do
-    defp safe_eval(safe_ast, env, bindings, pretty) do
-      {result, all_errors_and_warnings} =
-        Code.with_diagnostics(fn ->
-          try do
-            do_safe_eval(safe_ast, env, bindings, pretty)
-          catch
-            failure = %Failure{} ->
-              failure
-          end
-        end)
-
-      [] = all_errors_and_warnings
-      result
-    end
-  else
-    defp safe_eval(safe_ast, env, bindings, pretty) do
-      try do
-        do_safe_eval(safe_ast, env, bindings, pretty)
-      catch
-        failure = %Failure{} ->
-          failure
-      end
+  defp safe_eval(safe_ast, env, bindings, pretty) do
+    try do
+      do_safe_eval(safe_ast, env, bindings, pretty)
+    catch
+      failure = %Failure{} ->
+        failure
     end
   end
 
