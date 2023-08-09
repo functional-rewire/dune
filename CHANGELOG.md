@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.0 (2023-08-09)
+
 ### Breaking changes
 
 - Drop support for Elixir 1.13
