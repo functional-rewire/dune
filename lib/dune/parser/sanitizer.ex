@@ -66,6 +66,16 @@ defmodule Dune.Parser.Sanitizer do
         message = "dune parsing error: failed to safe parse\n         #{Macro.to_string(ast)}"
         new_failure(:parsing, message, unsafe.atom_mapping)
 
+      {:bin_modifier_restricted, ast} ->
+        message =
+          "** (DuneRestrictedError) bitstring modifier is restricted:\n         #{Macro.to_string(ast)}"
+
+        new_failure(:restricted, message, unsafe.atom_mapping)
+
+      {:bin_modifier_size, max_size} ->
+        message = "** (DuneRestrictedError) size modifiers above #{max_size} are restricted"
+        new_failure(:restricted, message, unsafe.atom_mapping)
+
       {:exception, error} ->
         message = Exception.format(:error, error)
         new_failure(:exception, message, unsafe.atom_mapping)
@@ -433,6 +443,19 @@ defmodule Dune.Parser.Sanitizer do
     sanitize_capture(ast, env)
   end
 
+  defp do_sanitize({:<<>>, meta, args}, env) do
+    sanitized_args =
+      Enum.map(args, fn
+        {:"::", meta, [expr, modifier]} ->
+          {:"::", meta, [do_sanitize(expr, env), check_bin_modifier(modifier)]}
+
+        arg ->
+          do_sanitize(arg, env)
+      end)
+
+    {:<<>>, meta, sanitized_args}
+  end
+
   defp do_sanitize({{:., _, [left, right]}, ctx, args} = raw, env)
        when is_atom(right) and is_list(args) do
     case left do
@@ -694,6 +717,55 @@ defmodule Dune.Parser.Sanitizer do
   defp sanitize_args_in_node({_, _, args} = raw, env) when is_list(args) do
     safe_args = sanitize_args(args, env)
     put_elem(raw, 2, safe_args)
+  end
+
+  @max_segment_size 256
+  @binary_modifiers [:binary, :bytes]
+  @allowed_modifiers [:integer, :float, :bits, :bitstring, :utf8, :utf16, :utf32] ++
+                       [:signed, :unsigned, :little, :big, :native]
+
+  defp check_bin_modifier(modifier) do
+    {size, unit} = check_bin_modifier_size(modifier, 8, nil)
+    unit = unit || 1
+
+    if size * unit > @max_segment_size do
+      throw({:bin_modifier_size, @max_segment_size})
+    end
+
+    modifier
+  end
+
+  defp check_bin_modifier_size({:-, _, [left, right]}, size, unit) do
+    {size, unit} = check_bin_modifier_size(left, size, unit)
+    check_bin_modifier_size(right, size, unit)
+  end
+
+  defp check_bin_modifier_size(modifier, size, unit) do
+    case modifier do
+      new_size when is_integer(new_size) ->
+        {new_size, unit}
+
+      {:size, _, [new_size]} when is_integer(new_size) ->
+        {new_size, unit}
+
+      {:unit, _, [new_unit]} when is_integer(new_unit) ->
+        {size, new_unit}
+
+      {:*, _, [new_size, new_unit]} when is_integer(new_size) and is_integer(new_unit) ->
+        {new_size, new_unit}
+
+      {:size, _, [{:^, _, [{var, _, ctx}]}]} when is_atom(var) and is_atom(ctx) ->
+        {size, unit}
+
+      {atom, _, ctx} when atom in @binary_modifiers and is_atom(ctx) ->
+        {size, unit || 8}
+
+      {atom, _, ctx} when atom in @allowed_modifiers and is_atom(ctx) ->
+        {size, unit}
+
+      other ->
+        throw({:bin_modifier_restricted, other})
+    end
   end
 
   defp env_variable do

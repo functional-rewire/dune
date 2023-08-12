@@ -141,6 +141,70 @@ defmodule DuneStringTest do
              } = ~E'~w[#{String.downcase("FOO")} bar baz]a'
     end
 
+    @tag :lts_only
+    test "bitstring modifiers" do
+      assert %Success{
+               value: <<3>>,
+               inspected: "<<3>>"
+             } = ~E'<<3>>'
+
+      assert %Success{
+               value: <<3::4>>,
+               inspected: "<<3::size(4)>>"
+             } = ~E'<<3::4>>'
+
+      assert %Success{
+               value: "ߧ",
+               inspected: ~S'"ߧ"'
+             } = ~E'<<2023::utf8>>'
+
+      assert %Success{
+               value: 12520,
+               inspected: "12520"
+             } = ~E'<<c::utf8>> = "ヨ"; c'
+
+      assert %Success{
+               value: <<3::4>>,
+               inspected: "<<3::size(4)>>"
+             } = ~E'<<3::size(4)>>'
+
+      assert %Success{
+               value: 6_382_179,
+               inspected: "6382179"
+             } = ~E'<<c::size(24)>> = "abc"; c'
+
+      assert %Success{
+               value: <<2, 3>>,
+               inspected: "<<2, 3>>"
+             } = ~E'<<_::binary-size(2), rest::binary>> = <<0, 1, 2, 3>>; rest'
+
+      assert %Success{
+               value: <<0, 0, 0, 1>>,
+               inspected: "<<0, 0, 0, 1>>"
+             } = ~E'''
+             x = 1
+             <<x::8*4>>
+             '''
+
+      assert %Success{
+               value: <<0, 0, 0, 1>>,
+               inspected: "<<0, 0, 0, 1>>"
+             } = ~E'''
+             x = 1
+             <<x::size(8)-unit(4)>>
+             '''
+
+      assert %Success{
+               value: {"Frank", "Walrus"},
+               inspected: ~S'{"Frank", "Walrus"}'
+             } = ~E'''
+             name_size = 5
+             <<name::binary-size(^name_size), " the ", species::binary>> = <<"Frank the Walrus">>
+             {name, species}
+             {"Frank", "Walrus"}
+             '''
+    end
+
     test "binary comprehensions" do
       assert %Success{
                value: [{213, 45, 132}, {64, 76, 32}],
@@ -671,6 +735,56 @@ defmodule DuneStringTest do
                type: :restricted,
                message: "** (DuneRestrictedError) function __ENV__/0 is restricted"
              } = ~E'__ENV__.requires'
+    end
+
+    test "bitstring modifiers" do
+      assert %Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) size modifiers above 256 are restricted"
+             } = ~E'<<0::123456789123456789>>'
+
+      assert %Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) size modifiers above 256 are restricted"
+             } = ~E'<<0::size(257)>>'
+
+      assert %Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) size modifiers above 256 are restricted"
+             } = ~E'<<0::256*2>>'
+
+      assert %Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) size modifiers above 256 are restricted"
+             } = ~E'<<0::integer-size(257)>>'
+
+      assert %Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) size modifiers above 256 are restricted"
+             } = ~E'<<0::integer-size(256)-unit(2)>>'
+
+      assert %Failure{
+               type: :restricted,
+               message:
+                 "** (DuneRestrictedError) bitstring modifier is restricted:\n         size(x)"
+             } = ~E'''
+             x = 123456789123456789
+             <<0::size(x)>>
+             '''
+
+      assert %Failure{
+               message:
+                 "** (DuneRestrictedError) bitstring modifier is restricted:\n         unquote(1)"
+             } = ~E'<<1::unquote(1)>>'
+
+      assert %Failure{
+               message:
+                 "** (DuneRestrictedError) bitstring modifier is restricted:\n         unquote(1)"
+             } = ~E'<<1::integer-unquote(1)>>'
+
+      assert %Failure{
+               message: "** (DuneRestrictedError) function unquote/1 is restricted"
+             } = ~E'<<unquote(1)>>'
     end
   end
 
