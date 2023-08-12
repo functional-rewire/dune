@@ -158,7 +158,7 @@ defmodule Dune.Eval.Process do
     case value do
       {:undefined_module, module, fun, arity} -> Failure.undefined_module(module, fun, arity)
       {:undefined_function, module, fun, arity} -> Failure.undefined_function(module, fun, arity)
-      _ -> %Failure{type: :throw, message: "** (throw) " <> inspect(value)}
+      {:safe_throw, thrown} -> %Failure{type: :throw, message: "** (throw) " <> inspect(thrown)}
     end
   end
 

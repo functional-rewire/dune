@@ -6,6 +6,10 @@
 
 - Add support for `dbg/1`
 
+### Bug fixes
+
+- Properly distinguish user code `throw/1` from internal ones
+
 ## v0.3.0 (2023-08-09)
 
 ### Breaking changes

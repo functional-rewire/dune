@@ -103,8 +103,6 @@ defmodule Dune.Allowlist.Default do
     then
     tap
     raise
-    reraise
-    throw
   ]a
 
   @kernel_sigils ~w[
@@ -161,6 +159,7 @@ defmodule Dune.Allowlist.Default do
     to_charlist: {Shims.Kernel, :safe_to_charlist},
     sigil_w: {Shims.Kernel, :safe_sigil_w},
     sigil_W: {Shims.Kernel, :safe_sigil_W},
+    throw: {Shims.Kernel, :safe_throw},
     dbg: {Shims.Kernel, :safe_dbg}
   ]
 

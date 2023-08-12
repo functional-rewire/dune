@@ -713,6 +713,9 @@ defmodule DuneStringTest do
 
     test "throw" do
       assert %Failure{type: :throw, message: "** (throw) :yo"} = ~E'throw(:yo)'
+
+      assert %Failure{type: :throw, message: "** (throw) {:undefined_function, Kernel, :+, 2}"} =
+               ~E'throw({:undefined_function, Kernel, :+, 2})'
     end
 
     test "raise" do

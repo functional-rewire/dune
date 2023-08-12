@@ -25,6 +25,10 @@ defmodule Dune.Shims.Kernel do
     end
   end
 
+  def safe_throw(_env, value) do
+    throw({:safe_throw, value})
+  end
+
   defmacro safe_dbg(_env) do
     error = Failure.restricted_function(Kernel, :safe_dbg, 0)
     throw(error)
