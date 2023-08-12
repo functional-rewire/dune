@@ -289,6 +289,80 @@ defmodule DuneStringTest do
              } = ~E'io = IO; io.puts(io.inspect(:foo9321))'
     end
 
+    test "dbg" do
+      assert %Success{value: :a__Dune_atom_1__, inspected: ~s(:foo913), stdio: stdio} =
+               ~E'dbg(:foo913)'
+
+      assert stdio == """
+             [nofile:1: (file)]
+             :foo913 #=> :foo913
+
+             """
+
+      assert %Success{value: :a__Dune_atom_1__, inspected: ~s(:foo914), stdio: stdio} =
+               ~E':foo914 |> dbg()'
+
+      assert stdio == """
+             [nofile:1: (file)]
+             :foo914 #=> :foo914
+
+             """
+
+      assert %Success{value: ":foo915", inspected: ~s(":foo915"), stdio: stdio} =
+               ~E':foo915 |> inspect() |> dbg()'
+
+      assert stdio == """
+             [nofile:1: (file)]
+             :foo915 #=> :foo915
+             |> inspect() #=> ":foo915"
+
+             """
+
+      assert %Success{value: "Hello World", inspected: ~s("Hello World"), stdio: stdio} =
+               ~E'"hello world" |> String.split() |> Enum.map_join(" ", &String.capitalize/1) |> dbg()'
+
+      assert stdio == """
+             [nofile:1: (file)]
+             "hello world" #=> "hello world"
+             |> String.split() #=> ["hello", "world"]
+             |> Enum.map_join(" ", &String.capitalize/1) #=> "Hello World"
+
+             """
+
+      assert %Success{value: ":foo987398", inspected: ~s(":foo987398"), stdio: stdio} =
+               ~E':foo987398 |> inspect() |> dbg() |> dbg()'
+
+      assert stdio == """
+             [nofile:1: (file)]
+             :foo987398 #=> :foo987398
+             |> inspect() #=> ":foo987398"
+
+             [nofile:1: (file)]
+             :foo987398 |> inspect() |> dbg() #=> ":foo987398"
+
+             """
+
+      assert %Dune.Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) function safe_dbg/0 is restricted"
+             } = ~E'dbg()'
+
+      assert %Dune.Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) function safe_dbg/2 is restricted"
+             } = ~E'dbg(:abc, syntax_colors: [])'
+
+      assert %Dune.Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) function Code.eval_string/1 is restricted"
+             } = ~E'Code.eval_string(":hello") |> dbg()'
+
+      assert %Dune.Failure{
+               type: :restricted,
+               message: "** (DuneRestrictedError) function Code.eval_string/1 is restricted"
+             } = ~E'":hello" |> Code.eval_string() |> dbg()'
+    end
+
     test "pretty option" do
       raw_string =
         ~S'{"This line is really long, maybe we should break", [%{bar: 1, baz: 2}, %{bar: 55}]}'

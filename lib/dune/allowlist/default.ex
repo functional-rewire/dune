@@ -115,7 +115,6 @@ defmodule Dune.Allowlist.Default do
     sigil_S
     sigil_T
     sigil_U
-    sigil_W
     sigil_c
     sigil_r
     sigil_s
@@ -161,7 +160,8 @@ defmodule Dune.Allowlist.Default do
     to_string: {Shims.Kernel, :safe_to_string},
     to_charlist: {Shims.Kernel, :safe_to_charlist},
     sigil_w: {Shims.Kernel, :safe_sigil_w},
-    sigil_W: {Shims.Kernel, :safe_sigil_W}
+    sigil_W: {Shims.Kernel, :safe_sigil_W},
+    dbg: {Shims.Kernel, :safe_dbg}
   ]
 
   @erlang_allowed [

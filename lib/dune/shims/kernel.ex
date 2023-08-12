@@ -25,6 +25,21 @@ defmodule Dune.Shims.Kernel do
     end
   end
 
+  defmacro safe_dbg(_env) do
+    error = Failure.restricted_function(Kernel, :safe_dbg, 0)
+    throw(error)
+  end
+
+  defmacro safe_dbg(_env, _term) do
+    # should never be called because the sanitizer handles it
+    raise "unexpected call safe_dbg/2"
+  end
+
+  defmacro safe_dbg(_env, _term, _opts) do
+    error = Failure.restricted_function(Kernel, :safe_dbg, 2)
+    throw(error)
+  end
+
   def safe_dot(_env, %{} = map, key) do
     # TODO test key error
     Map.fetch!(map, key)

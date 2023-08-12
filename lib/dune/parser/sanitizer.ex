@@ -454,13 +454,80 @@ defmodule Dune.Parser.Sanitizer do
     {{:., dot_ctx, [safe_anonymous]}, ctx, safe_args}
   end
 
+  defp do_sanitize({:dbg, meta, [expr]}, env) do
+    quote do
+      value = unquote(do_sanitize(expr, env))
+
+      IO.puts([
+        "[nofile:",
+        to_string(unquote(meta[:line])),
+        ": (file)]\n",
+        unquote(Macro.to_string(expr)),
+        " #=> ",
+        Dune.Shims.Kernel.safe_inspect(unquote(env_variable()), value),
+        ?\n
+      ])
+
+      value
+    end
+  end
+
+  defp do_sanitize({:|>, _, [expr, {:dbg, meta, []}]}, env) do
+    header =
+      quote do
+        ["[nofile:", to_string(unquote(meta[:line])), ": (file)]\n"]
+      end
+
+    quote do
+      value = unquote(dbg_pipeline(expr, env, header))
+      IO.write("\n")
+      value
+    end
+  end
+
+  defp dbg_pipeline({:|>, _, [left, {fun, meta, args} = right]}, env, header)
+       when is_list(args) and fun != :dbg do
+    ast_with_placeholder = do_sanitize({fun, meta, [:__DUNE_RESERVED__ | args]}, env)
+
+    ast =
+      Macro.prewalk(ast_with_placeholder, fn
+        :__DUNE_RESERVED__ -> dbg_pipeline(left, env, header)
+        other -> other
+      end)
+
+    quote do
+      value = unquote(ast)
+
+      IO.puts([
+        "|> ",
+        unquote(Macro.to_string(right)),
+        " #=> ",
+        Dune.Shims.Kernel.safe_inspect(unquote(env_variable()), value)
+      ])
+
+      value
+    end
+  end
+
+  defp dbg_pipeline(expr, env, header) do
+    quote do
+      value = unquote(do_sanitize(expr, env))
+
+      IO.puts([
+        unquote_splicing(header),
+        unquote(Macro.to_string(expr)),
+        " #=> ",
+        Dune.Shims.Kernel.safe_inspect(unquote(env_variable()), value)
+      ])
+
+      value
+    end
+  end
+
   defp do_sanitize({:|>, _, _} = ast, env) do
     case try_expand_once(ast) do
-      {:ok, {atom, _, _} = expanded} when atom != :|> ->
+      {atom, _, _} = expanded when atom != :|> ->
         do_sanitize(expanded, env)
-
-      {:error, error} ->
-        throw({:exception, error})
     end
   end
 
@@ -469,10 +536,10 @@ defmodule Dune.Parser.Sanitizer do
   end
 
   defp try_expand_once(ast) do
-    {:ok, Macro.expand_once(ast, __ENV__)}
+    Macro.expand_once(ast, __ENV__)
   rescue
     error ->
-      {:error, error}
+      throw({:exception, error})
   end
 
   defp do_sanitize_dot(left, key, args, ctx, env) do
