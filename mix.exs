@@ -17,6 +17,7 @@ defmodule Dune.MixProject do
       # Hex
       description: "A sandbox for Elixir to safely evaluate untrusted code from user input",
       package: package(),
+      aliases: aliases(),
       docs: docs()
     ]
   end
@@ -53,6 +54,10 @@ defmodule Dune.MixProject do
       links: %{"GitHub" => @github_url},
       files: ~w(lib mix.exs .formatter.exs README.md LICENSE.md CHANGELOG.md)
     ]
+  end
+
+  defp aliases do
+    [docs: ["compile --force", "docs"]]
   end
 
   defp docs do
