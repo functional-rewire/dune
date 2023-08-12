@@ -464,7 +464,7 @@ defmodule Dune.Parser.Sanitizer do
         ": (file)]\n",
         unquote(Macro.to_string(expr)),
         " #=> ",
-        Dune.Shims.Kernel.safe_inspect(unquote(env_variable()), value),
+        inspect(value, pretty: true),
         ?\n
       ])
 
@@ -502,7 +502,7 @@ defmodule Dune.Parser.Sanitizer do
         "|> ",
         unquote(Macro.to_string(right)),
         " #=> ",
-        Dune.Shims.Kernel.safe_inspect(unquote(env_variable()), value)
+        inspect(value, pretty: true)
       ])
 
       value
@@ -517,7 +517,7 @@ defmodule Dune.Parser.Sanitizer do
         unquote_splicing(header),
         unquote(Macro.to_string(expr)),
         " #=> ",
-        Dune.Shims.Kernel.safe_inspect(unquote(env_variable()), value)
+        inspect(value, pretty: true)
       ])
 
       value

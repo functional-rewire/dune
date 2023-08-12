@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Enhancements
+
+- `dbg/1` uses pretty printing
+
 ### Bug fixes
 
 - Fix error message on restricted `dbg/0`
