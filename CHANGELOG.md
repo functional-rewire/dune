@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.2 (2023-08-12)
+
 ### Enhancements
 
 - `dbg/1` uses pretty printing
