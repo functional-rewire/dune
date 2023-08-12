@@ -344,12 +344,12 @@ defmodule DuneStringTest do
 
       assert %Dune.Failure{
                type: :restricted,
-               message: "** (DuneRestrictedError) function safe_dbg/0 is restricted"
+               message: "** (DuneRestrictedError) function dbg/0 is restricted"
              } = ~E'dbg()'
 
       assert %Dune.Failure{
                type: :restricted,
-               message: "** (DuneRestrictedError) function safe_dbg/2 is restricted"
+               message: "** (DuneRestrictedError) function dbg/2 is restricted"
              } = ~E'dbg(:abc, syntax_colors: [])'
 
       assert %Dune.Failure{

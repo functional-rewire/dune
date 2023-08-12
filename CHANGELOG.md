@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Bug fixes
+
+- Fix error message on restricted `dbg/0`
+
 ## v0.3.1 (2023-08-12)
 
 ### Enhancements

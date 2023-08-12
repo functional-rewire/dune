@@ -30,7 +30,7 @@ defmodule Dune.Shims.Kernel do
   end
 
   defmacro safe_dbg(_env) do
-    error = Failure.restricted_function(Kernel, :safe_dbg, 0)
+    error = Failure.restricted_function(Kernel, :dbg, 0)
     throw(error)
   end
 
@@ -40,7 +40,7 @@ defmodule Dune.Shims.Kernel do
   end
 
   defmacro safe_dbg(_env, _term, _opts) do
-    error = Failure.restricted_function(Kernel, :safe_dbg, 2)
+    error = Failure.restricted_function(Kernel, :dbg, 2)
     throw(error)
   end
 
