@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.1 (2023-08-12)
+
 ### Enhancements
 
 - Add support for `dbg/1`
