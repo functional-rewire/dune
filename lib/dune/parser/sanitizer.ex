@@ -508,45 +508,6 @@ defmodule Dune.Parser.Sanitizer do
     end
   end
 
-  defp dbg_pipeline({:|>, _, [left, {fun, meta, args} = right]}, env, header)
-       when is_list(args) and fun != :dbg do
-    ast_with_placeholder = do_sanitize({fun, meta, [:__DUNE_RESERVED__ | args]}, env)
-
-    ast =
-      Macro.prewalk(ast_with_placeholder, fn
-        :__DUNE_RESERVED__ -> dbg_pipeline(left, env, header)
-        other -> other
-      end)
-
-    quote do
-      value = unquote(ast)
-
-      IO.puts([
-        "|> ",
-        unquote(Macro.to_string(right)),
-        " #=> ",
-        inspect(value, pretty: true)
-      ])
-
-      value
-    end
-  end
-
-  defp dbg_pipeline(expr, env, header) do
-    quote do
-      value = unquote(do_sanitize(expr, env))
-
-      IO.puts([
-        unquote_splicing(header),
-        unquote(Macro.to_string(expr)),
-        " #=> ",
-        inspect(value, pretty: true)
-      ])
-
-      value
-    end
-  end
-
   defp do_sanitize({:|>, _, _} = ast, env) do
     case try_expand_once(ast) do
       {atom, _, _} = expanded when atom != :|> ->
@@ -717,6 +678,45 @@ defmodule Dune.Parser.Sanitizer do
   defp sanitize_args_in_node({_, _, args} = raw, env) when is_list(args) do
     safe_args = sanitize_args(args, env)
     put_elem(raw, 2, safe_args)
+  end
+
+  defp dbg_pipeline({:|>, _, [left, {fun, meta, args} = right]}, env, header)
+       when is_list(args) and fun != :dbg do
+    ast_with_placeholder = do_sanitize({fun, meta, [:__DUNE_RESERVED__ | args]}, env)
+
+    ast =
+      Macro.prewalk(ast_with_placeholder, fn
+        :__DUNE_RESERVED__ -> dbg_pipeline(left, env, header)
+        other -> other
+      end)
+
+    quote do
+      value = unquote(ast)
+
+      IO.puts([
+        "|> ",
+        unquote(Macro.to_string(right)),
+        " #=> ",
+        inspect(value, pretty: true)
+      ])
+
+      value
+    end
+  end
+
+  defp dbg_pipeline(expr, env, header) do
+    quote do
+      value = unquote(do_sanitize(expr, env))
+
+      IO.puts([
+        unquote_splicing(header),
+        unquote(Macro.to_string(expr)),
+        " #=> ",
+        inspect(value, pretty: true)
+      ])
+
+      value
+    end
   end
 
   @max_segment_size 256
