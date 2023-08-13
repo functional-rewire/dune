@@ -105,6 +105,7 @@ defmodule Dune.Eval.Process do
     end
   end
 
+  # TODO remove then dropping support for 1.14
   if System.version() |> Version.compare("1.15.0") != :lt do
     defp catch_diagnostics(fun) do
       with_diagnostics =
