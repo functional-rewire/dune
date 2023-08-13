@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.3 (2023-08-13)
+
 ### Bug fixes
 
 - Fix vulnerability allowing an attacker to crash the VM using bitstrings
