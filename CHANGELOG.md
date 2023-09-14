@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.4 (2023-09-14)
+
 ### Bug fixes
 
 - Fix `UndefinedFunctionError` when using external modules in a custom allowlist
