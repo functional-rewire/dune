@@ -171,6 +171,16 @@ defmodule Dune.Allowlist do
     quote do
       unquote(def_spec(spec))
       unquote(def_fun_status(spec))
+
+      @on_load :ensure_alias_atoms
+
+      # Aliases like Foo.Bar are represented on the AST level as {:alias, _, [:Foo, :Bar]}
+      # We need to force the creation of these atoms, which might otherwise not be
+      # available when we parse due to atom encoding logic.
+      def ensure_alias_atoms do
+        # do nothing and returns :ok
+        Enum.each(unquote(alias_atoms(spec)), & &1)
+      end
     end
   end
 
@@ -235,5 +245,20 @@ defmodule Dune.Allowlist do
       _other ->
         :ok
     end
+  end
+
+  defp alias_atoms(spec) do
+    spec.modules
+    |> Enum.flat_map(fn {mod, _} ->
+      try do
+        Module.split(mod)
+      rescue
+        ArgumentError ->
+          # "expected an Elixir module" error -> erlang module
+          []
+      end
+    end)
+    |> Enum.map(&String.to_atom/1)
+    |> Enum.uniq()
   end
 end

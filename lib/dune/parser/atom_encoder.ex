@@ -125,16 +125,9 @@ defmodule Dune.Parser.AtomEncoder do
     WithClauseError
   ]
 
-  # TODO add
-  @erlang_modules [:math]
-
-  @elixir_reprs @elixir_modules
+  @module_reprs @elixir_modules
                 |> Enum.flat_map(&Module.split/1)
-                |> Enum.map(&{&1, String.to_existing_atom(&1)})
-
-  @erlang_reprs Enum.map(@erlang_modules, &{Atom.to_string(&1), &1})
-
-  @module_reprs Map.new(@elixir_reprs ++ @erlang_reprs)
+                |> Map.new(&{&1, String.to_existing_atom(&1)})
 
   @spec load_atom_mapping(AtomMapping.t() | nil) :: :ok
   def load_atom_mapping(nil), do: :ok
