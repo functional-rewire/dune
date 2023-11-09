@@ -6,7 +6,7 @@ defmodule Dune.Eval.FunctionClauseError do
   def message(err = %__MODULE__{function: function, args: args}) do
     module = inspect(err.module)
     arity = length(args)
-    args = inspect(args) |> String.slice(1..-2)
+    args = inspect(args) |> String.slice(1..-2//1)
 
     "no function clause matching in #{module}.#{function}/#{arity}: #{module}.#{function}(#{args})"
   end
