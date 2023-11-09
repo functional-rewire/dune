@@ -1,7 +1,7 @@
 defmodule Dune.MixProject do
   use Mix.Project
 
-  @version "0.3.4"
+  @version "0.3.5"
   @github_url "https://github.com/functional-rewire/dune"
 
   def project do

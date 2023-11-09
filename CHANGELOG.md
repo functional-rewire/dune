@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.5 (2023-11-10)
+
 ### Enhancements
 
 - Support Elixir 1.16 (handle line-column positions in diagnostics)
