@@ -207,7 +207,10 @@ defmodule Dune.Eval.Process do
     Enum.map_join(
       diagnostics,
       "\n",
-      &"#{&1.severity}: #{&1.message}\n  #{&1.file}:#{&1.position}"
+      &"#{&1.severity}: #{&1.message}\n  #{&1.file}:#{format_pos(&1.position)}"
     )
   end
+
+  defp format_pos(integer) when is_integer(integer), do: Integer.to_string(integer)
+  defp format_pos({line, col}), do: [Integer.to_string(line), ?:, Integer.to_string(col)]
 end
