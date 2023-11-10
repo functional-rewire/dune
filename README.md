@@ -147,3 +147,4 @@ executed is actually different.
 Some parts of the language are being restricted because they present a direct
 security risk, while some other would need to be reimplemented in an alternative
 way and therefore need a consequent amount of work that hasn't been done yet.
+foo
