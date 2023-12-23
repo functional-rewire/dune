@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.6 (2023-12-23)
+
 - Support Elixir 1.16
 - `Dune.Allowlist.Default` allows `**/2`
 
