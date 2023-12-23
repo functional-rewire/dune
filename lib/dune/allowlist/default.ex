@@ -55,6 +55,7 @@ defmodule Dune.Allowlist.Default do
     -
     --
     *
+    **
     /
     <>
     ==
