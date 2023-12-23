@@ -856,15 +856,16 @@ defmodule DuneStringTest do
              } = ~E':foo_bar.baz()'
     end
 
+    @tag :lts_only
     test "syntax error" do
       assert %Failure{
                type: :parsing,
-               message: "missing terminator: ) (for \"(\" starting at line 1)"
+               message: "missing terminator: )"
              } = ~E'foo('
 
       assert %Failure{
                type: :parsing,
-               message: "missing terminator: } (for \"{\" starting at line 1)"
+               message: "missing terminator: }"
              } = ~E'{'
 
       assert %Failure{

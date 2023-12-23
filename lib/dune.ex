@@ -117,7 +117,7 @@ defmodule Dune do
       %Dune.Success{inspected: "{:+, [line: 1], [1, 2]}", stdio: "", value: {:+, [line: 1], [1, 2]}}
 
       iex> Dune.string_to_quoted("[invalid")
-      %Dune.Failure{stdio: "", message: "missing terminator: ] (for \"[\" starting at line 1)", type: :parsing}
+      %Dune.Failure{stdio: "", message: "missing terminator: ]", type: :parsing}
 
   The `pretty` option can make the AST more readable by adding newlines to `inspected`:
 
