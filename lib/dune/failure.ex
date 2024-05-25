@@ -22,7 +22,7 @@ defmodule Dune.Failure do
 
   @type t :: %__MODULE__{type: error_type, message: String.t(), stdio: binary}
   @enforce_keys [:type, :message]
-  defstruct [:type, :message, stdio: ""]
+  defstruct @enforce_keys ++ [stdio: ""]
 
   @doc false
   def restricted_function(module, fun, arity) do

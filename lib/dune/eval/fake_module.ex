@@ -7,7 +7,7 @@ defmodule Dune.Eval.FakeModule do
           public_funs: %{optional(atom) => %{required(non_neg_integer) => function}}
         }
   @enforce_keys [:public_funs]
-  defstruct [:public_funs]
+  defstruct @enforce_keys
 
   def get_function(%__MODULE__{public_funs: funs}, fun_name, arity)
       when is_atom(fun_name) and is_integer(arity) do

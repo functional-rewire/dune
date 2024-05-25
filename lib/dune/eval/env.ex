@@ -10,7 +10,7 @@ defmodule Dune.Eval.Env do
           fake_modules: %{optional(atom) => FakeModule.t()}
         }
   @enforce_keys [:atom_mapping, :allowlist, :fake_modules]
-  defstruct [:atom_mapping, :allowlist, :fake_modules]
+  defstruct @enforce_keys
 
   def new(atom_mapping = %AtomMapping{}, allowlist) when is_atom(allowlist) do
     %__MODULE__{atom_mapping: atom_mapping, allowlist: allowlist, fake_modules: %{}}

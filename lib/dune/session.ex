@@ -32,7 +32,7 @@ defmodule Dune.Session do
           bindings: keyword
         }
   @enforce_keys [:env, :compile_env, :bindings, :last_result]
-  defstruct [:env, :compile_env, :bindings, :last_result]
+  defstruct @enforce_keys
 
   @default_env Eval.Env.new(Dune.AtomMapping.new(), Allowlist.Default)
   @default_compile_env Parser.CompileEnv.new(Allowlist.Default)

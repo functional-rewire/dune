@@ -12,7 +12,7 @@ defmodule Dune.Parser.CompileEnv do
           # requires
         }
   @enforce_keys [:module, :allowlist, :fake_modules]
-  defstruct [:module, :allowlist, :fake_modules]
+  defstruct @enforce_keys
 
   def new(allowlist) do
     %__MODULE__{

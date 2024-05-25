@@ -7,7 +7,7 @@ defmodule Dune.Allowlist.Spec do
 
   @type t :: %__MODULE__{modules: %{optional(module) => [{atom, non_neg_integer, status}]}}
   @enforce_keys [:modules]
-  defstruct [:modules]
+  defstruct @enforce_keys
 
   def new do
     %__MODULE__{modules: %{}}

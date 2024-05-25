@@ -18,5 +18,5 @@ defmodule Dune.Success do
           stdio: binary
         }
   @enforce_keys [:value, :inspected, :stdio]
-  defstruct [:value, :inspected, :stdio]
+  defstruct @enforce_keys
 end

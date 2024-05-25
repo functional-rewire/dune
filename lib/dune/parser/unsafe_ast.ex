@@ -7,5 +7,5 @@ defmodule Dune.Parser.UnsafeAst do
           atom_mapping: Dune.AtomMapping.t()
         }
   @enforce_keys [:ast, :atom_mapping]
-  defstruct [:ast, :atom_mapping]
+  defstruct @enforce_keys
 end
