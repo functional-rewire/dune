@@ -1,11 +1,12 @@
 defmodule Dune.Allowlist.Spec do
   @moduledoc false
 
+  alias Dune.Allowlist
   alias Dune.Parser.RealModule
 
-  @type status :: Dune.Allowlist.status()
-
-  @type t :: %__MODULE__{modules: %{optional(module) => [{atom, non_neg_integer, status}]}}
+  @type t :: %__MODULE__{
+          modules: %{optional(module) => [{atom, non_neg_integer, Allowlist.status()}]}
+        }
   @enforce_keys [:modules]
   defstruct @enforce_keys
 
@@ -13,7 +14,7 @@ defmodule Dune.Allowlist.Spec do
     %__MODULE__{modules: %{}}
   end
 
-  @spec list_fun_statuses(t) :: list({module, atom, status})
+  @spec list_fun_statuses(t) :: list({module, atom, Allowlist.status()})
   def list_fun_statuses(%__MODULE__{modules: modules}) do
     for {module, funs} <- modules, {fun_name, _arity, status} <- funs do
       {module, fun_name, status}
@@ -22,7 +23,7 @@ defmodule Dune.Allowlist.Spec do
     |> Enum.dedup()
   end
 
-  @spec list_ordered_modules(t) :: list({module, {atom, status}})
+  @spec list_ordered_modules(t) :: list({module, {atom, Allowlist.status()}})
   def list_ordered_modules(%__MODULE__{modules: modules}) do
     modules
     |> Enum.map(fn {module, funs} ->

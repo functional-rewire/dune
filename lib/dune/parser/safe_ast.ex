@@ -2,7 +2,7 @@ defmodule Dune.Parser.SafeAst do
   @moduledoc false
 
   @type t :: %__MODULE__{
-          ast: String.t(),
+          ast: Macro.t(),
           atom_mapping: Dune.AtomMapping.t(),
           compile_env: Dune.Parser.CompileEnv.t()
         }

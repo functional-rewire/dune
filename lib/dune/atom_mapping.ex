@@ -4,7 +4,6 @@ defmodule Dune.AtomMapping do
   alias Dune.{Success, Failure}
 
   @type substitute_atom :: atom
-  @type substitute_string :: String.t()
   @type original_string :: String.t()
   @type sub_mapping :: %{optional(substitute_atom) => original_string}
   @type extra_info :: %{optional(substitute_atom) => :wrapped}

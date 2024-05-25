@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Bug fixes
+
+- Fix incorrect type definitions, remove unused ones
+
 ### Enhancements
 
 - Add an `:inspect_sort_maps` option for deterministic outputs

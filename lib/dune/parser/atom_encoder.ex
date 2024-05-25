@@ -4,7 +4,6 @@ defmodule Dune.Parser.AtomEncoder do
   alias Dune.AtomMapping
 
   @type atom_category :: :alias | :private_var | :public_var | :other
-  @type mapping :: [{atom, String.t()}]
 
   @atom_categories 4
 

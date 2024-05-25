@@ -1,8 +1,6 @@
 defmodule Dune.Eval.FakeModule do
   @moduledoc false
 
-  @type function_with_arity :: {atom, non_neg_integer}
-
   @type t :: %__MODULE__{
           public_funs: %{optional(atom) => %{required(non_neg_integer) => function}}
         }
