@@ -313,6 +313,11 @@ defmodule Dune.Allowlist.Default do
   allow Date, :all
   allow DateTime, :all
   allow NaiveDateTime, :all
+
+  if System.version() |> Version.compare("1.17.0-rc.0") != :lt do
+    allow Duration, :all
+  end
+
   allow Calendar, except: ~w[put_time_zone_database]a
   allow Calendar.ISO, :all
   allow Time, :all
