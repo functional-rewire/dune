@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Enhancements
+
+- Add an `:inspect_sort_maps` option for deterministic outputs
+
 ## v0.3.6 (2023-12-23)
 
 - Support Elixir 1.16

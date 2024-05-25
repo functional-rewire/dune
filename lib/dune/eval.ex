@@ -45,14 +45,15 @@ defmodule Dune.Eval do
 
   defp safe_eval(safe_ast, env, bindings, pretty) do
     try do
-      do_safe_eval(safe_ast, env, bindings, pretty)
+      inspect_opts = [pretty: pretty, custom_options: [sort_maps: true]]
+      do_safe_eval(safe_ast, env, bindings, inspect_opts)
     catch
       failure = %Failure{} ->
         failure
     end
   end
 
-  defp do_safe_eval(safe_ast, env, nil, pretty) do
+  defp do_safe_eval(safe_ast, env, nil, inspect_opts) do
     binding = [env__Dune__: env]
     {value, new_env, _new_bindings} = eval_quoted(safe_ast, binding)
 
@@ -60,18 +61,18 @@ defmodule Dune.Eval do
       value: value,
       # another important thing about inspect is that it force-evaluates
       # potentially huge shared structs => OOM before sending
-      inspected: Shims.Kernel.safe_inspect(new_env, value, pretty: pretty),
+      inspected: Shims.Kernel.safe_inspect(new_env, value, inspect_opts),
       stdio: ""
     }
   end
 
-  defp do_safe_eval(safe_ast, env, bindings, pretty) when is_list(bindings) do
+  defp do_safe_eval(safe_ast, env, bindings, inspect_opts) when is_list(bindings) do
     binding = [env__Dune__: env] ++ bindings
     {value, new_env, new_bindings} = eval_quoted(safe_ast, binding)
 
     %Success{
       value: {value, new_env, new_bindings},
-      inspected: Shims.Kernel.safe_inspect(new_env, value, pretty: pretty),
+      inspected: Shims.Kernel.safe_inspect(new_env, value, inspect_opts),
       stdio: ""
     }
   end
