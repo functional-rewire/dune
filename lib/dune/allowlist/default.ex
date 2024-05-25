@@ -150,7 +150,14 @@ defmodule Dune.Allowlist.Default do
     update_in
   ]a
 
-  @kernel_allowed @kernel_operators ++
+  # TODO Remove when dropping support for Elixir 1.16
+  extra_kernel_functions =
+    if System.version() |> Version.compare("1.17.0-rc.0") != :lt,
+      do: [:to_timeout, :is_non_struct_map],
+      else: []
+
+  @kernel_allowed extra_kernel_functions ++
+                    @kernel_operators ++
                     @kernel_guards ++ @kernel_macros ++ @kernel_sigils ++ @kernel_functions
 
   @kernel_shims [
@@ -314,6 +321,7 @@ defmodule Dune.Allowlist.Default do
   allow DateTime, :all
   allow NaiveDateTime, :all
 
+  # TODO Remove when dropping support for Elixir 1.16
   if System.version() |> Version.compare("1.17.0-rc.0") != :lt do
     allow Duration, :all
   end

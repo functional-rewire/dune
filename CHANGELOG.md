@@ -8,7 +8,8 @@
 
 ### Enhancements
 
-- `Dune.Allowlist.Default` allows the new `Duration` module
+- `Dune.Allowlist.Default` allows the new `Duration` module and new kernel
+  functions
 - Add an `:inspect_sort_maps` option for deterministic outputs
 
 ## v0.3.6 (2023-12-23)
