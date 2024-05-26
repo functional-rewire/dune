@@ -42,7 +42,7 @@ defmodule Dune do
 
   ## Examples
 
-      iex> Dune.eval_string("IO.puts('Hello world!')")
+      iex> Dune.eval_string("IO.puts(\"Hello world!\")")
       %Dune.Success{inspected: ":ok", stdio: "Hello world!\n", value: :ok}
 
       iex> Dune.eval_string("File.cwd!()")

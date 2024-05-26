@@ -2,6 +2,7 @@ defmodule Dune.Parser.StringParser do
   @moduledoc false
 
   alias Dune.{AtomMapping, Failure, Opts}
+  alias Dune.Helpers.Diagnostics
   alias Dune.Parser.{AtomEncoder, UnsafeAst}
 
   @typep previous_session :: %{atom_mapping: AtomMapping.t()}
@@ -26,9 +27,18 @@ defmodule Dune.Parser.StringParser do
     maybe_load_atom_mapping(previous_session)
     encoder = fn binary, _ctx -> AtomEncoder.static_atoms_encoder(binary, pool_size) end
 
-    case Code.string_to_quoted(string, static_atoms_encoder: encoder, existing_atoms_only: true) do
-      {:ok, ast} -> maybe_encode_modules(ast, previous_session, encode_modules?)
-      {:error, {_ctx, error, token}} -> handle_failure(error, token)
+    {result, diagnostics} =
+      Diagnostics.with_diagnostics_polyfill(fn ->
+        Code.string_to_quoted(string, static_atoms_encoder: encoder, existing_atoms_only: true)
+      end)
+
+    case result do
+      {:ok, ast} ->
+        maybe_encode_modules(ast, previous_session, encode_modules?)
+        |> Diagnostics.prepend_diagnostics(diagnostics)
+
+      {:error, {_ctx, error, token}} ->
+        handle_failure(error, token)
     end
   end
 

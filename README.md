@@ -34,7 +34,7 @@ early stage: expect bugs and vulnerabilities.
   recursive functions
 
 ```elixir
-iex> Dune.eval_string("IO.puts('Hello world!')")
+iex> Dune.eval_string("IO.puts(\"Hello world!\")")
 %Dune.Success{inspected: ":ok", stdio: "Hello world!\n", value: :ok}
 
 iex> Dune.eval_string("File.cwd!()")
@@ -62,7 +62,8 @@ iex> Dune.Session.new()
 #Dune.Session<last_result: %Dune.Success{inspected: "3", stdio: "", value: 3}, ...>
 ```
 
-`Dune.string_to_quoted/2` returns the AST corresponding to the provided `string`, without leaking atoms:
+`Dune.string_to_quoted/2` returns the AST corresponding to the provided
+`string`, without leaking atoms:
 
 ```elixir
 iex> Dune.string_to_quoted("foo(:bar)").inspected

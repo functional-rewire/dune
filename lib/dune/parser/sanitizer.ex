@@ -13,7 +13,8 @@ defmodule Dune.Parser.Sanitizer do
         %SafeAst{
           ast: safe_ast,
           atom_mapping: unsafe.atom_mapping,
-          compile_env: new_env
+          compile_env: new_env,
+          stdio: unsafe.stdio
         }
 
       {:restricted, module, fun, arity} ->

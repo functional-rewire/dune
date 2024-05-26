@@ -2,6 +2,7 @@ defmodule Dune.Eval.Process do
   @moduledoc false
 
   alias Dune.Failure
+  alias Dune.Helpers.Diagnostics
 
   def run(fun, opts = %Dune.Opts{}) when is_function(fun, 0) do
     with_string_io(fn string_io ->
@@ -79,7 +80,7 @@ defmodule Dune.Eval.Process do
 
     receive do
       {:ok, result, diagnostics} ->
-        prepend_diagnostics(result, diagnostics)
+        Diagnostics.prepend_diagnostics(result, diagnostics)
 
       {:compile_error, error, diagnostics, stacktrace} ->
         format_compile_error(error, diagnostics, stacktrace)
@@ -105,35 +106,23 @@ defmodule Dune.Eval.Process do
     end
   end
 
-  # TODO remove then dropping support for 1.14
-  if System.version() |> Version.compare("1.15.0") != :lt do
-    defp catch_diagnostics(fun) do
-      with_diagnostics =
-        Code.with_diagnostics(fn ->
-          try do
-            {:ok, fun.()}
-          rescue
-            err in CompileError ->
-              {err, __STACKTRACE__}
-          end
-        end)
+  defp catch_diagnostics(fun) do
+    {result, diagnostics} =
+      Diagnostics.with_diagnostics_polyfill(fn ->
+        try do
+          {:ok, fun.()}
+        rescue
+          err in CompileError ->
+            {err, __STACKTRACE__}
+        end
+      end)
 
-      case with_diagnostics do
-        {{:ok, result}, diagnostics} ->
-          {:ok, result, diagnostics}
+    case result do
+      {:ok, value} ->
+        {:ok, value, diagnostics}
 
-        {{%CompileError{} = err, stacktrace}, diagnostics} ->
-          {:compile_error, err, diagnostics, stacktrace}
-      end
-    end
-  else
-    defp catch_diagnostics(fun) do
-      try do
-        {:ok, fun.(), []}
-      rescue
-        err in CompileError ->
-          {:compile_error, err, [], __STACKTRACE__}
-      end
+      {%CompileError{} = err, stacktrace} ->
+        {:compile_error, err, diagnostics, stacktrace}
     end
   end
 
@@ -193,24 +182,7 @@ defmodule Dune.Eval.Process do
     %Failure{
       type: :compile_error,
       message: message,
-      stdio: format_diagnostics(diagnostics)
+      stdio: Diagnostics.format_diagnostics(diagnostics)
     }
   end
-
-  defp prepend_diagnostics(result, []), do: result
-
-  defp prepend_diagnostics(result, diagnostics) do
-    %{result | stdio: format_diagnostics(diagnostics) <> "\n\n"}
-  end
-
-  defp format_diagnostics(diagnostics) do
-    Enum.map_join(
-      diagnostics,
-      "\n",
-      &"#{&1.severity}: #{&1.message}\n  #{&1.file}:#{format_pos(&1.position)}"
-    )
-  end
-
-  defp format_pos(integer) when is_integer(integer), do: Integer.to_string(integer)
-  defp format_pos({line, col}), do: [Integer.to_string(line), ?:, Integer.to_string(col)]
 end

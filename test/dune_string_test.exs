@@ -942,6 +942,18 @@ defmodule DuneStringTest do
              """
     end
 
+    @tag :lts_only
+    test "parser warnings" do
+      assert %Success{value: ~c"123abc", inspected: "~c\"123abc\"", stdio: stdio} =
+               ~E"'123' ++ [97, 98, 99]"
+
+      assert stdio == """
+             warning: single-quoted strings represent charlists. Use ~c\"\" if you indeed want a charlist or use \"\" instead
+               nofile:1:1
+
+             """
+    end
+
     test "def/defp outside of module" do
       assert %Failure{
                type: :exception,

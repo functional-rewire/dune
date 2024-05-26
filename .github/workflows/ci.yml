@@ -19,7 +19,7 @@ jobs:
             testArgs: "--exclude=lts_only"
           - elixir: "1.16.0"
             otp: "26.0"
-            testArgs: ""
+            testArgs: "--exclude=lts_only"
           - elixir: "1.17.0-rc.0"
             otp: "27.0"
             testArgs: ""

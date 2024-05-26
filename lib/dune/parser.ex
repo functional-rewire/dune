@@ -58,7 +58,7 @@ defmodule Dune.Parser do
       %Success{
         value: unsafe.ast,
         inspected: inspected,
-        stdio: ""
+        stdio: unsafe.stdio
       }
     end
   end

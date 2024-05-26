@@ -14,7 +14,12 @@ defmodule Dune.Eval do
   def run(parsed, opts, previous_session \\ nil)
 
   def run(
-        %SafeAst{ast: ast, atom_mapping: atom_mapping, compile_env: %{allowlist: allowlist}},
+        %SafeAst{
+          ast: ast,
+          atom_mapping: atom_mapping,
+          compile_env: %{allowlist: allowlist},
+          stdio: parser_stdio
+        },
         opts = %Opts{},
         previous_session
       ) do
@@ -27,6 +32,7 @@ defmodule Dune.Eval do
         env = %{env | atom_mapping: atom_mapping, allowlist: allowlist}
         do_run(ast, atom_mapping, opts, env, bindings)
     end
+    |> prepend_parser_stdio(parser_stdio)
   end
 
   def run(%Failure{} = failure, _opts, _bindings), do: failure
@@ -41,6 +47,12 @@ defmodule Dune.Eval do
       )
 
     AtomMapping.replace_in_result(atom_mapping, result)
+  end
+
+  defp prepend_parser_stdio(result, ""), do: result
+
+  defp prepend_parser_stdio(result, parser_stdio) do
+    Map.update!(result, :stdio, &(parser_stdio <> &1))
   end
 
   defp safe_eval(safe_ast, env, bindings, pretty) do

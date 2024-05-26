@@ -10,5 +10,16 @@ defmodule DuneStringToQuotedTest do
                inspected: ~S"{:__aliases__, [line: 1], [:Foooo, :Barrr]}"
              } = Dune.string_to_quoted(~S(Foooo.Barrr))
     end
+
+    @tag :lts_only
+    test "captures tokenizer warnings" do
+      assert %Success{
+               value: ~c"single quotes",
+               inspected: ~S(~c"single quotes"),
+               stdio: stdio
+             } = Dune.string_to_quoted(~S('single quotes'))
+
+      assert stdio =~ "warning: single-quoted strings represent charlists."
+    end
   end
 end
