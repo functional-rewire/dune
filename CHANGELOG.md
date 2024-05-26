@@ -2,6 +2,10 @@
 
 ## Dev
 
+### Bug fixes
+
+- Make sure the `Duration` atom is available
+
 ## v0.3.7 (2024-05-26)
 
 ### Bug fixes
