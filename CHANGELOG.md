@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.7 (2024-05-26)
+
 ### Bug fixes
 
 - Fix incorrect type definitions, remove unused ones
