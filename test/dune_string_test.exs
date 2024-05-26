@@ -811,7 +811,8 @@ defmodule DuneStringTest do
     end
 
     test "returns a big binary" do
-      assert %Failure{message: "Execution stopped - " <> _} = ~E'String.duplicate("foo", 200_000)'
+      assert %Failure{message: "Execution stopped - " <> _} =
+               ~E'String.duplicate("foo", 200_000) <> "!"'
     end
   end
 
