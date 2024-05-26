@@ -44,7 +44,7 @@ defmodule Dune.Opts do
 
   - `inspect_sort_maps`:
     Sort maps when inspecting the result, useful to keep the output deterministic.
-    Should be a boolean. Defaults to `false`.
+    Should be a boolean. Defaults to `false`. Only works since Elixir >= 1.14.4.
 
   ### Extra note about `atom_pool_size`
 

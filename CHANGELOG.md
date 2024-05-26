@@ -9,7 +9,7 @@
 ### Enhancements
 
 - `Dune.Allowlist.Default` allows the new `Duration` module and new kernel
-  functions
+  functions from Elixir 1.17
 - Add an `:inspect_sort_maps` option for deterministic outputs
 - Capture and return parser warnings in `stdio`
 
