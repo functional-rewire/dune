@@ -5,7 +5,7 @@ defmodule DuneStringTest do
 
   defmacro sigil_E(call, _expr) do
     quote do
-      Dune.eval_string(unquote(call), timeout: 100)
+      Dune.eval_string(unquote(call), timeout: 100, inspect_sort_maps: true)
     end
   end
 

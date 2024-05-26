@@ -41,7 +41,7 @@ defmodule Dune.Eval do
     result =
       Dune.Eval.Process.run(
         fn ->
-          safe_eval(ast, env, bindings, opts.pretty)
+          safe_eval(ast, env, bindings, opts.pretty, opts.inspect_sort_maps)
         end,
         opts
       )
@@ -55,9 +55,9 @@ defmodule Dune.Eval do
     Map.update!(result, :stdio, &(parser_stdio <> &1))
   end
 
-  defp safe_eval(safe_ast, env, bindings, pretty) do
+  defp safe_eval(safe_ast, env, bindings, pretty, sort_maps) do
     try do
-      inspect_opts = [pretty: pretty, custom_options: [sort_maps: true]]
+      inspect_opts = [pretty: pretty, custom_options: [sort_maps: sort_maps]]
       do_safe_eval(safe_ast, env, bindings, inspect_opts)
     catch
       failure = %Failure{} ->
