@@ -105,7 +105,7 @@ The package can be installed by adding `dune` to your list of dependencies in
 ```elixir
 def deps do
   [
-    {:dune, "~> 0.3.8"}
+    {:dune, "~> 0.3.9"}
   ]
 end
 ```
