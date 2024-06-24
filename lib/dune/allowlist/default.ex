@@ -331,6 +331,7 @@ defmodule Dune.Allowlist.Default do
   allow Time, :all
   allow Base, :all
   allow URI, :all
+  allow Version, :all
   allow Bitwise, :all
   allow Function, only: ~w[identity]a
   allow IO, only: @io_allowed, shims: @io_shims

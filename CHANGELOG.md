@@ -2,6 +2,8 @@
 
 ## Dev
 
+- `Dune.Allowlist.Default` allows the `Version` module
+
 ## v0.3.8 (2024-05-26)
 
 ### Bug fixes
