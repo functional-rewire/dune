@@ -2,6 +2,8 @@
 
 ## Dev
 
+- Enable support for Elixir 1.17
+
 ## v0.3.9 (2024-06-25)
 
 - `Dune.Allowlist.Default` allows the `Version` module
