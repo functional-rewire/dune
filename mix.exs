@@ -11,7 +11,6 @@ defmodule Dune.MixProject do
       elixir: ">= 1.14.0 and < 1.18.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      preferred_cli_env: preferred_cli_env(),
       dialyzer: [flags: [:missing_return, :extra_return]],
 
       # Hex
@@ -26,14 +25,6 @@ defmodule Dune.MixProject do
   def application do
     [
       extra_applications: [:logger]
-    ]
-  end
-
-  defp preferred_cli_env do
-    [
-      docs: :docs,
-      "hex.publish": :docs,
-      dialyzer: :test
     ]
   end
 
@@ -58,6 +49,10 @@ defmodule Dune.MixProject do
 
   defp aliases do
     [docs: ["compile --force", "docs"]]
+  end
+
+  def cli do
+    [preferred_envs: [docs: :docs, "hex.publish": :docs, dialyzer: :test]]
   end
 
   defp docs do
