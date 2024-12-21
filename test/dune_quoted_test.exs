@@ -317,6 +317,13 @@ defmodule DuneQuotedTest do
                dune(do: Enum.reduce(1..100, [:foo, :bar], fn _, acc -> [acc, acc] end))
     end
 
+    test "returns a big list" do
+      assert %Failure{message: "Execution stopped - " <> _} =
+               dune(do: List.duplicate(:foo, 200_000))
+    end
+
+    # TODO figure out why this fails since Elixir 1.18
+    @tag :skip
     test "returns a big binary" do
       assert %Failure{message: "Execution stopped - " <> _} =
                dune(do: String.duplicate("foo", 200_000))

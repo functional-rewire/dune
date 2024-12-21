@@ -2,6 +2,8 @@
 
 ## Dev
 
+- Enable support for Elixir 1.18
+
 ## v0.3.10 (2024-07-14)
 
 - Enable support for Elixir 1.17
