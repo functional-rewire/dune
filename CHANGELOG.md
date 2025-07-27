@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.12 (2025-07-27)
+
 - `Dune.Allowlist.Default` exposes a safe shim for the `JSON` module
 
 ## v0.3.11 (2024-12-21)
