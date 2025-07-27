@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.13 (2025-07-27)
+
 - Fix older versions pre-1.18 that don't have `JSON`
 
 ## v0.3.12 (2025-07-27)
