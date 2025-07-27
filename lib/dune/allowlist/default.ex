@@ -317,10 +317,11 @@ defmodule Dune.Allowlist.Default do
     except: ~w[to_char_list]a,
     shims: [to_string: {Shims.Atom, :to_string}, to_charlist: {Shims.Atom, :to_charlist}]
 
-  allow JSON,
-    only: ~w[decode decode!]a,
-    shims:
-      Enum.map(~w[protocol_encode encode! encode_to_iodata!]a, &{&1, {Shims.JSON, &1}}) |> dbg()
+  if Code.ensure_loaded?(JSON) do
+    allow JSON,
+      only: ~w[decode decode!]a,
+      shims: Enum.map(~w[protocol_encode encode! encode_to_iodata!]a, &{&1, {Shims.JSON, &1}})
+  end
 
   allow Date, :all
   allow DateTime, :all

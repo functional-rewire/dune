@@ -327,6 +327,7 @@ defmodule DuneStringTest do
       assert ":turkic" = ~E':turkic'.value |> inspect()
     end
 
+    @tag :lts_only
     test "JSON with atoms" do
       assert %Success{value: ~S("json101"), inspected: ~S("\"json101\"")} =
                ~E'JSON.encode!(:json101)'
