@@ -120,7 +120,7 @@ defmodule Dune.Session do
       concat(key, concat(" ", to_doc(value, opts)))
     end
 
-    if function_exported?(Macro, :inspect_atom, 2) do
+    if Code.ensure_loaded?(Macro) and function_exported?(Macro, :inspect_atom, 2) do
       defp inspect_as_key(key), do: Macro.inspect_atom(:key, key)
     else
       defp inspect_as_key(key), do: Code.Identifier.inspect_as_key(key)
