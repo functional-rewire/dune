@@ -19,7 +19,7 @@ defmodule DuneStringToQuotedTest do
                stdio: stdio
              } = Dune.string_to_quoted(~S('single quotes'))
 
-      assert stdio =~ "warning: single-quoted strings represent charlists."
+      assert stdio =~ "warning: using single-quoted strings to represent charlists is deprecated."
     end
   end
 end

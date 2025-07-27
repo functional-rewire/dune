@@ -972,7 +972,10 @@ defmodule DuneStringTest do
                ~E"'123' ++ [97, 98, 99]"
 
       assert stdio =~
-               "warning: single-quoted strings represent charlists. Use ~c\"\" if you indeed want a charlist or use \"\" instead"
+               """
+               warning: using single-quoted strings to represent charlists is deprecated.
+               Use ~c\"\" if you indeed want a charlist or use \"\" instead\
+               """
     end
 
     test "def/defp outside of module" do
