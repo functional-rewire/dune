@@ -2,6 +2,8 @@
 
 ## Dev
 
+- `Dune.Allowlist.Default` exposes a safe shim for the `JSON` module
+
 ## v0.3.11 (2024-12-21)
 
 - Enable support for Elixir 1.18

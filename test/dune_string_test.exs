@@ -327,6 +327,22 @@ defmodule DuneStringTest do
       assert ":turkic" = ~E':turkic'.value |> inspect()
     end
 
+    test "JSON with atoms" do
+      assert %Success{value: ~S("json101"), inspected: ~S("\"json101\"")} =
+               ~E'JSON.encode!(:json101)'
+
+      assert %Success{value: ~S("json102"), inspected: ~S("\"json102\"")} =
+               ~E'JSON.encode_to_iodata!(:json102) |> IO.iodata_to_binary()'
+
+      assert %Success{
+               value: ~S({"json201":["json202",123,"foo",null,true]}),
+               inspected: ~S("{\"json201\":[\"json202\",123,\"foo\",null,true]}")
+             } = ~E'JSON.encode!(%{json201: [:json202, 123, "foo", nil, true]})'
+
+      assert %Success{value: "json301", inspected: ~S("json301")} =
+               ~E'JSON.decode!("\"json301\"")'
+    end
+
     test "stdio capture" do
       assert %Success{value: :ok, inspected: ~s(:ok), stdio: "yo!\n"} = ~E'IO.puts("yo!")'
       assert %Success{value: :ok, inspected: ~s(:ok), stdio: "foo987\n"} = ~E'IO.puts(:foo987)'
