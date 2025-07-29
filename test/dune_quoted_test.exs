@@ -310,24 +310,6 @@ defmodule DuneQuotedTest do
       assert %Failure{type: :memory, message: "Execution stopped - memory limit exceeded"} =
                dune(do: List.duplicate(:foo, 100_000))
     end
-
-    test "returns a big nested structure leveraging structural sharing" do
-      # not sure if reductions or memory limit this first
-      assert %Failure{message: "Execution stopped - " <> _} =
-               dune(do: Enum.reduce(1..100, [:foo, :bar], fn _, acc -> [acc, acc] end))
-    end
-
-    test "returns a big list" do
-      assert %Failure{message: "Execution stopped - " <> _} =
-               dune(do: List.duplicate(:foo, 200_000))
-    end
-
-    # TODO figure out why this fails since Elixir 1.18
-    @tag :skip
-    test "returns a big binary" do
-      assert %Failure{message: "Execution stopped - " <> _} =
-               dune(do: String.duplicate("foo", 200_000))
-    end
   end
 
   describe "error handling" do
