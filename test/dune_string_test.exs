@@ -451,8 +451,11 @@ defmodule DuneStringTest do
       with_break =
         ~s'{"This line is really long, maybe we should break",\n [%{bar: 1, baz: 2}, %{bar: 55}]}'
 
-      assert %Success{inspected: ^raw_string} = Dune.eval_string(raw_string)
-      assert %Success{inspected: ^with_break} = Dune.eval_string(raw_string, pretty: true)
+      assert %Success{inspected: ^raw_string} =
+               Dune.eval_string(raw_string, inspect_sort_maps: true)
+
+      assert %Success{inspected: ^with_break} =
+               Dune.eval_string(raw_string, pretty: true, inspect_sort_maps: true)
     end
   end
 
