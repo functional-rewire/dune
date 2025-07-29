@@ -56,6 +56,10 @@ defmodule Dune.OOMSafetyTest do
       Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> IO.iodata_to_binary()
     end
 
+    test_execution_stops "IO.iodata_length" do
+      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> IO.iodata_length()
+    end
+
     test_execution_stops "IO.chardata_to_string" do
       Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> IO.chardata_to_string()
     end
