@@ -103,6 +103,10 @@ defmodule Dune.Shims.Kernel do
     Shims.Atom.to_string(env, atom)
   end
 
+  def safe_to_string(env, atom) when is_list(atom) do
+    Shims.List.to_string(env, atom)
+  end
+
   def safe_to_string(_env, other), do: to_string(other)
 
   def safe_to_charlist(env, atom) when is_atom(atom) do

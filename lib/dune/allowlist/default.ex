@@ -284,15 +284,10 @@ defmodule Dune.Allowlist.Default do
     apply: {Shims.Kernel, :safe_apply}
   ]
 
-  @io_allowed ~w[
-    chardata_to_string
-    iodata_length
-    iodata_to_binary
-  ]a
-
   @io_shims [
     puts: {Shims.IO, :puts},
-    inspect: {Shims.IO, :inspect}
+    inspect: {Shims.IO, :inspect},
+    chardata_to_string: {Shims.List, :to_string}
   ]
 
   allow Kernel.SpecialForms, only: @special_forms_allowed
@@ -305,7 +300,7 @@ defmodule Dune.Allowlist.Default do
   allow MapSet, :all
   allow Keyword, :all
   allow Tuple, :all
-  allow List, except: ~w[to_atom to_existing_atom]a
+  allow List, shims: [to_string: {Shims.List, :to_string}], except: ~w[to_atom to_existing_atom]a
   allow Enum, shims: [join: {Shims.Enum, :join}, map_join: {Shims.Enum, :map_join}]
   # TODO double check
   allow Stream, :all
@@ -340,7 +335,7 @@ defmodule Dune.Allowlist.Default do
   allow Version, :all
   allow Bitwise, :all
   allow Function, only: ~w[identity]a
-  allow IO, only: @io_allowed, shims: @io_shims
+  allow IO, only: ~w[iodata_length iodata_to_binary]a, shims: @io_shims
   allow Process, only: [:sleep]
 
   allow :erlang, only: @erlang_allowed, shims: @erlang_shims

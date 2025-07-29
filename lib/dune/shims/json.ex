@@ -3,6 +3,7 @@ if Code.ensure_loaded?(JSON) do
     @moduledoc false
 
     alias Dune.AtomMapping
+    alias Dune.Shims
 
     def protocol_encode(env, value, encoder) when is_non_struct_map(value) do
       case :maps.next(:maps.iterator(value)) do
@@ -43,11 +44,8 @@ if Code.ensure_loaded?(JSON) do
       end
     end
 
-    defp key(env, key, encoder) when is_atom(key),
-      do: encoder.(AtomMapping.to_string(env.atom_mapping, key), encoder)
-
     defp key(_env, key, encoder) when is_binary(key), do: encoder.(key, encoder)
-    defp key(_env, key, encoder), do: encoder.(String.Chars.to_string(key), encoder)
+    defp key(env, key, encoder), do: encoder.(Shims.Kernel.safe_to_string(env, key), encoder)
 
     def encode!(env, term) do
       encode!(env, term, &protocol_encode(env, &1, &2))

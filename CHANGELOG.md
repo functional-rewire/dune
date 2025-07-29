@@ -4,6 +4,8 @@
 
 ### Security fixes
 
+- Use safe shims for chardata -> string conversions (`List.to_string/1`, ...)
+  in `Dune.Allowlist.Default`
 - Restrict more unsafe modules and functions in `Dune.Allowlist.Default`:
   - `:unicode`
   - `:erts_debug.flat_size`

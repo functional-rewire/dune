@@ -39,8 +39,35 @@ defmodule Dune.OOMSafetyTest do
       Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> inspect()
     end
 
-    test_execution_stops "JSON encode" do
-      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> JSON.encode!()
+    test_execution_stops "string interpolation" do
+      bomb = Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end)
+      "#{bomb}!"
+    end
+
+    test_execution_stops "to_string" do
+      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> to_string()
+    end
+
+    test_execution_stops "List.to_string" do
+      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> List.to_string()
+    end
+
+    test_execution_stops "IO.iodata_to_binary" do
+      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> IO.iodata_to_binary()
+    end
+
+    test_execution_stops "IO.chardata_to_string" do
+      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> IO.chardata_to_string()
+    end
+
+    test_execution_stops "Enum.join" do
+      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> Enum.join()
+    end
+
+    @tag :lts_only
+    test_execution_stops "JSON encode key" do
+      bomb = Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end)
+      JSON.encode!(%{bomb => 123})
     end
   end
 end
