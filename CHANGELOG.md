@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.14 (2025-07-29)
+
 ### Security fixes
 
 - Use safe shims for chardata -> string conversions (`List.to_string/1`, ...)
