@@ -356,8 +356,10 @@ defmodule Dune.Allowlist.Default do
   allow :proplists, :all
   allow :queue, :all
   allow :string, :all
-  allow :unicode, :all
   allow :rand, :all
-  allow :erts_debug, only: ~w[same size size_shared flat_size]a
+  # note: :unicode is not safe and should be shimmed due to "structural sharing bombs"
+
+  # note: flat_size is unsafe due to "structural sharing bombs"
+  allow :erts_debug, only: ~w[same size size_shared]a
   allow :zlib, only: ~w[zip unzip gzip gunzip compress uncompress]a
 end

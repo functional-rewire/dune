@@ -2,6 +2,12 @@
 
 ## Dev
 
+### Security fixes
+
+- Restrict more unsafe modules and functions in `Dune.Allowlist.Default`:
+  - `:unicode`
+  - `:erts_debug.flat_size`
+
 ## v0.3.13 (2025-07-27)
 
 - Fix older versions pre-1.18 that don't have `JSON`
