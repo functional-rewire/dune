@@ -2,6 +2,7 @@ defmodule Dune.Shims.Kernel do
   @moduledoc false
 
   alias Dune.{AtomMapping, Failure, Shims}
+  alias Dune.Helpers.TermChecker
 
   defmacro safe_sigil_w(_env, _, ~c"a") do
     error = Failure.restricted_function(Kernel, :sigil_w, 2)
@@ -95,6 +96,7 @@ defmodule Dune.Shims.Kernel do
   end
 
   def safe_inspect(env, term, opts) do
+    TermChecker.check(term)
     inspected = inspect(term, opts)
     AtomMapping.replace_in_string(env.atom_mapping, inspected)
   end
