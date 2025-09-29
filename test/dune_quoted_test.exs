@@ -104,7 +104,7 @@ defmodule DuneQuotedTest do
     end
 
     test "sigils" do
-      assert %Success{value: ~r/(a|b)?c/} = dune(do: ~r/(a|b)?c/)
+      assert %Success{value: %Regex{source: "(a|b)?c"}} = dune(do: ~r/(a|b)?c/)
       assert %Success{value: ~U[2021-05-20 01:02:03Z]} = dune(do: ~U[2021-05-20 01:02:03Z])
       assert %Success{value: [~c"foo", ~c"bar", ~c"baz"]} = dune(do: ~W[foo bar baz]c)
 

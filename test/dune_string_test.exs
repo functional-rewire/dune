@@ -115,7 +115,8 @@ defmodule DuneStringTest do
 
     @tag :lts_only
     test "sigils" do
-      assert %Success{value: ~r/(a|b)?c/, inspected: ~S'~r/(a|b)?c/'} = ~E'~r/(a|b)?c/'
+      assert %Success{value: %Regex{source: "(a|b)?c"}, inspected: ~S'~r/(a|b)?c/'} =
+               ~E'~r/(a|b)?c/'
 
       assert %Success{value: ~U[2021-05-20 01:02:03Z], inspected: ~S'~U[2021-05-20 01:02:03Z]'} =
                ~E'~U[2021-05-20 01:02:03Z]'
@@ -530,8 +531,10 @@ defmodule DuneStringTest do
 
       assert %Failure{
                type: :exception,
-               message: "** (KeyError) key :job not found in: %{age: 100}\n" <> _
+               message: "** (KeyError) key :job not found in" <> rest_message
              } = ~E'users = [john: %{age: 100}]; users[:john].job'
+
+      assert rest_message =~ "%{age: 100}"
 
       assert %Failure{
                type: :exception,

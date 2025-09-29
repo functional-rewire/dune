@@ -36,7 +36,8 @@ defmodule Dune.OOMSafetyTest do
     end
 
     test_execution_stops "inspect" do
-      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end) |> inspect()
+      Enum.reduce(1..100, ["foo", "bar"], fn _, acc -> [acc, acc] end)
+      |> inspect(limit: :infinity)
     end
 
     test_execution_stops "string interpolation" do
