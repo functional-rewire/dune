@@ -2,12 +2,14 @@
 
 ## Dev
 
+- Support Elixir 1.19
+
 ## v0.3.14 (2025-07-29)
 
 ### Security fixes
 
-- Use safe shims for chardata -> string conversions (`List.to_string/1`, ...)
-  in `Dune.Allowlist.Default`
+- Use safe shims for chardata -> string conversions (`List.to_string/1`, ...) in
+  `Dune.Allowlist.Default`
 - Restrict more unsafe modules and functions in `Dune.Allowlist.Default`:
   - `:unicode`
   - `:erts_debug.flat_size`
