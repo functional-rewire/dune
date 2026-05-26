@@ -327,6 +327,12 @@ defmodule Dune.Allowlist.Default do
     allow Duration, :all
   end
 
+  # TODO Remove when dropping support for Elixir 1.19
+  extra_io_functions =
+    if System.version() |> Version.compare("1.20.0-rc.0") != :lt,
+      do: [:iodata_empty?],
+      else: []
+
   allow Calendar, except: ~w[put_time_zone_database]a
   allow Calendar.ISO, :all
   allow Time, :all
@@ -335,7 +341,7 @@ defmodule Dune.Allowlist.Default do
   allow Version, :all
   allow Bitwise, :all
   allow Function, only: ~w[identity]a
-  allow IO, only: ~w[iodata_length iodata_to_binary]a, shims: @io_shims
+  allow IO, only: ~w[iodata_length iodata_to_binary]a ++ extra_io_functions, shims: @io_shims
   allow Process, only: [:sleep]
 
   allow :erlang, only: @erlang_allowed, shims: @erlang_shims
