@@ -22,14 +22,14 @@ jobs:
           - elixir: "1.17.3"
             otp: "27.0"
             testArgs: "--exclude=lts_only"
-          - elixir: "1.18.0"
-            otp: "27.0"
-            testArgs: "--exclude=lts_only"
           - elixir: "1.18.4"
             otp: "27.0"
             testArgs: "--exclude=lts_only"
-          - elixir: "1.19.0"
+          - elixir: "1.19.5"
             otp: "28.1"
+            testArgs: "--exclude=lts_only"
+          - elixir: "1.20.0-rc.6"
+            otp: "29.0"
             testArgs: ""
     steps:
       - uses: actions/checkout@v2
