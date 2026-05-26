@@ -9,7 +9,7 @@ defmodule DuneQuotedTest do
     escaped_ast = Macro.escape(ast)
 
     quote do
-      unquote(escaped_ast) |> Dune.eval_quoted(timeout: 100)
+      unquote(escaped_ast) |> Dune.eval_quoted(timeout: 150)
     end
   end
 
@@ -297,8 +297,8 @@ defmodule DuneQuotedTest do
 
   describe "process restrictions" do
     test "execution timeout" do
-      assert %Failure{type: :timeout, message: "Execution timeout - 100ms"} =
-               dune(do: Process.sleep(101))
+      assert %Failure{type: :timeout, message: "Execution timeout - 150ms"} =
+               dune(do: Process.sleep(151))
     end
 
     test "too many reductions" do

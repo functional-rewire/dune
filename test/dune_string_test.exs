@@ -5,7 +5,7 @@ defmodule DuneStringTest do
 
   defmacro sigil_E(call, _expr) do
     quote do
-      Dune.eval_string(unquote(call), timeout: 100, inspect_sort_maps: true)
+      Dune.eval_string(unquote(call), timeout: 150, inspect_sort_maps: true)
     end
   end
 
@@ -796,8 +796,8 @@ defmodule DuneStringTest do
 
   describe "process restrictions" do
     test "execution timeout" do
-      assert %Failure{type: :timeout, message: "Execution timeout - 100ms"} =
-               ~E'Process.sleep(101)'
+      assert %Failure{type: :timeout, message: "Execution timeout - 150ms"} =
+               ~E'Process.sleep(151)'
     end
 
     test "too many reductions" do

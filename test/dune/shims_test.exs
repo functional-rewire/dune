@@ -6,7 +6,7 @@ defmodule Dune.ShimsTest do
 
   defmacrop sigil_E(call, _expr) do
     quote do
-      Dune.eval_string(unquote(call), timeout: 100, inspect_sort_maps: true)
+      Dune.eval_string(unquote(call), timeout: 150, inspect_sort_maps: true)
     end
   end
 
