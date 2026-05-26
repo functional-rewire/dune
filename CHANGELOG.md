@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.16 (2026-05-26)
+
 - Support Elixir 1.20
 - `Dune.Allowlist.Default` allows the new `IO.iodata_empty?/1`
 
