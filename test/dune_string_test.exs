@@ -907,7 +907,8 @@ defmodule DuneStringTest do
       assert %Failure{
                type: :compile_error,
                message: "** (CompileError) nofile: cannot compile file (errors have been logged)",
-               stdio: "error: expected -> clauses for :do in \"case\"\n  nofile:2"
+               stdio:
+                 ~s(error: invalid "do" block in "case", it expects "pattern -> expr" clauses\n  nofile:2)
              } = ~E'
                 case 1 do
                 end

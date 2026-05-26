@@ -159,6 +159,7 @@ defmodule Dune.Eval.Process do
       case head do
         {:erl_eval, :do_apply, _, _} -> 3
         {:elixir_eval, :__FILE__, _, _} -> 3
+        {:elixir_compiler, :__FILE__, _, _} -> 3
         _ -> 2
       end
 
