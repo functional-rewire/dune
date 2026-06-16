@@ -292,15 +292,23 @@ defmodule Dune.Allowlist.Default do
 
   allow Kernel.SpecialForms, only: @special_forms_allowed
 
+  # TODO remove when dropping support for Elixir 1.20
+  maybe_to_unsafe =
+    if function_exported?(String, :to_unsafe_atom, 1), do: [:to_unsafe_atom], else: []
+
   allow Kernel, only: @kernel_allowed, shims: @kernel_shims
   allow Access, :all
-  allow String, except: ~w[to_atom to_existing_atom]a
+  allow String, except: ~w[to_atom to_existing_atom]a ++ maybe_to_unsafe
   allow Regex, :all
   allow Map, :all
   allow MapSet, :all
   allow Keyword, :all
   allow Tuple, :all
-  allow List, shims: [to_string: {Shims.List, :to_string}], except: ~w[to_atom to_existing_atom]a
+
+  allow List,
+    shims: [to_string: {Shims.List, :to_string}],
+    except: ~w[to_atom to_existing_atom]a ++ maybe_to_unsafe
+
   allow Enum, shims: [join: {Shims.Enum, :join}, map_join: {Shims.Enum, :map_join}]
   # TODO double check
   allow Stream, :all
