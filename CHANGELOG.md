@@ -2,6 +2,11 @@
 
 ## Dev
 
+### Security fixes
+
+- Pre-emptively block `String.to_unsafe_atom` and `List.to_unsafe_atom` in
+  `Dune.Allowlist.Default` (will be released in Elixir 1.21)
+
 ## v0.3.16 (2026-05-26)
 
 - Support Elixir 1.20

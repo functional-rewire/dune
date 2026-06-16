@@ -199,6 +199,20 @@ defmodule DuneQuotedTest do
                message: "** (DuneRestrictedError) function List.to_atom/1 is restricted"
              } = dune(do: List.to_atom(~c"foo"))
 
+      # TODO remove when dropping support for Elixir 1.20
+      if function_exported?(String, :to_unsafe_atom, 1) do
+        assert %Failure{
+                 type: :restricted,
+                 message:
+                   "** (DuneRestrictedError) function String.to_unsafe_atom/1 is restricted"
+               } = dune(do: String.to_unsafe_atom("foo"))
+
+        assert %Failure{
+                 type: :restricted,
+                 message: "** (DuneRestrictedError) function List.to_unsafe_atom/1 is restricted"
+               } = dune(do: List.to_unsafe_atom(~c"foo"))
+      end
+
       assert %Failure{
                type: :restricted,
                message:
