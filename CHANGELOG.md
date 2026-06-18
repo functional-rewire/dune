@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.17 (2026-06-19)
+
 ### Security fixes
 
 - Pre-emptively block `String.to_unsafe_atom` and `List.to_unsafe_atom` in
