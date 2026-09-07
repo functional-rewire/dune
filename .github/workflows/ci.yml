@@ -28,7 +28,7 @@ jobs:
           - elixir: "1.19.5"
             otp: "28.1"
             testArgs: "--exclude=lts_only"
-          - elixir: "1.20.0-rc.6"
+          - elixir: "1.20.4"
             otp: "29.0"
             testArgs: ""
     steps:
