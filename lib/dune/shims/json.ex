@@ -5,6 +5,8 @@ if Code.ensure_loaded?(JSON) do
     alias Dune.AtomMapping
     alias Dune.Shims
 
+    @dialyzer :no_improper_lists
+
     def protocol_encode(env, value, encoder) when is_non_struct_map(value) do
       case :maps.next(:maps.iterator(value)) do
         :none ->
