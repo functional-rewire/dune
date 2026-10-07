@@ -800,6 +800,11 @@ defmodule DuneStringTest do
                ~E'Process.sleep(151)'
     end
 
+    test "parse timeout" do
+      assert %Failure{type: :timeout, message: "Parsing timeout - 0ms"} =
+               Dune.eval_string("hello = :world", parse_timeout: 0)
+    end
+
     test "too many reductions" do
       assert %Failure{type: :reductions, message: "Execution stopped - reductions limit exceeded"} =
                ~E'Enum.any?(1..1_000_000, &(&1 < 0))'

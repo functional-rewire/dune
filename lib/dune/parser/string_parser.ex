@@ -15,7 +15,17 @@ defmodule Dune.Parser.StringParser do
     # import: do in a different process because the AtomEncoder pollutes the Process dict
     fn -> do_parse_string(string, opts, previous_session, encode_modules?) end
     |> Task.async()
-    |> Task.await()
+    |> await_task!(opts.parse_timeout)
+  end
+
+  defp await_task!(task, timeout) do
+    case Task.yield(task, timeout) || Task.shutdown(task) do
+      {:ok, result} ->
+        result
+
+      nil ->
+        %Failure{type: :timeout, message: "Parsing timeout - #{timeout}ms"}
+    end
   end
 
   defp do_parse_string(

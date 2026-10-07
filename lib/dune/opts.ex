@@ -31,7 +31,12 @@ defmodule Dune.Opts do
     Should be an integer `> 0`. Defaults to `30_000`.
   - `timeout`:
     Limits the time the evaluation process is authorized to run (in milliseconds).
-    Should be an integer `> 0`. Defaults to `50`.
+    This does not include the `parse_timeout`.
+    Should be an integer `>= 0` or `:infinity`. Defaults to `50`.
+    - `parse_timeout`:
+    Limits the maximal amount of time spent parsing a string to safe AST (in milliseconds).
+    This comes in addition to `timeout`.
+    Should be an integer `>= 0` or `:infinity`. Defaults to the value of `timeout`.
 
   The evaluation process will still need to parse and execute the sanitized AST, so using
   too low limits here would leave only a small margin to actually run user code.
@@ -69,7 +74,8 @@ defmodule Dune.Opts do
           allowlist: module,
           max_heap_size: pos_integer,
           max_reductions: pos_integer,
-          timeout: pos_integer,
+          timeout: timeout,
+          parse_timeout: timeout,
           pretty: boolean,
           inspect_sort_maps: boolean
         }
@@ -80,8 +86,12 @@ defmodule Dune.Opts do
             max_heap_size: 50_000,
             max_reductions: 30_000,
             timeout: 50,
+            parse_timeout: 50,
             pretty: false,
             inspect_sort_maps: false
+
+  defguardp is_timeout(timeout)
+            when (is_integer(timeout) and timeout >= 0) or timeout == :infinity
 
   @doc """
   Validates untrusted options from a keyword or a map and returns a `Dune.Opts` struct.
@@ -96,7 +106,8 @@ defmodule Dune.Opts do
         max_length: 5000,
         max_reductions: 30000,
         pretty: false,
-        timeout: 50
+        timeout: 50,
+        parse_timeout: 50
       }
 
       iex> Dune.Opts.validate!(atom_pool_size: 10)
@@ -115,7 +126,7 @@ defmodule Dune.Opts do
       ** (ArgumentError) List does not implement the Dune.Allowlist behaviour
 
       iex> Dune.Opts.validate!(max_reductions: 10_000, max_heap_size: 10_000, timeout: 20)
-      %Dune.Opts{max_heap_size: 10_000, max_reductions: 10_000, timeout: 20}
+      %Dune.Opts{max_heap_size: 10_000, max_reductions: 10_000, timeout: 20, parse_timeout: 20}
 
       iex> Dune.Opts.validate!(max_heap_size: 0)
       ** (ArgumentError) max_heap_size should be an integer > 0
@@ -124,7 +135,7 @@ defmodule Dune.Opts do
       ** (ArgumentError) max_reductions should be an integer > 0
 
       iex> Dune.Opts.validate!(timeout: "55")
-      ** (ArgumentError) timeout should be an integer > 0
+      ** (ArgumentError) timeout should be an integer >= 0 or :infinity
 
       iex> Dune.Opts.validate!(pretty: :maybe)
       ** (ArgumentError) pretty should be a boolean
@@ -132,7 +143,13 @@ defmodule Dune.Opts do
   """
   @spec validate!(Keyword.t() | map) :: t
   def validate!(opts) do
-    struct(__MODULE__, opts) |> do_validate()
+    struct = struct(__MODULE__, opts) |> do_validate()
+
+    if Keyword.has_key?(opts, :parse_timeout) do
+      struct
+    else
+      %{struct | parse_timeout: struct.timeout}
+    end
   end
 
   defp do_validate(%{atom_pool_size: atom_pool_size})
@@ -159,8 +176,12 @@ defmodule Dune.Opts do
     raise ArgumentError, message: "max_heap_size should be an integer > 0"
   end
 
-  defp do_validate(%{timeout: timeout}) when not (is_integer(timeout) and timeout > 0) do
-    raise ArgumentError, message: "timeout should be an integer > 0"
+  defp do_validate(%{timeout: timeout}) when not is_timeout(timeout) do
+    raise ArgumentError, message: "timeout should be an integer >= 0 or :infinity"
+  end
+
+  defp do_validate(%{parse_timeout: timeout}) when not is_timeout(timeout) do
+    raise ArgumentError, message: "parse_timeout should be an integer >= 0 or :infinity"
   end
 
   defp do_validate(%{pretty: pretty}) when not is_boolean(pretty) do
@@ -171,9 +192,8 @@ defmodule Dune.Opts do
     raise ArgumentError, message: "inspect_sort_maps should be a boolean"
   end
 
-  defp do_validate(opts = %{allowlist: allowlist}) do
+  defp do_validate(%{allowlist: allowlist} = opts) do
     Allowlist.ensure_implements_behaviour!(allowlist)
-
     opts
   end
 end
