@@ -2,6 +2,8 @@
 
 ## Dev
 
+## v0.3.18 (2026-10-07)
+
 - Add a `:parse_timeout` option to specify the maximum time spent during parsing.
   Prior to this change, the parsing task might have timed out after 5000ms, the new value defaults to
   the same value as the `:timeout` option.
