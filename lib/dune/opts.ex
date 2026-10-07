@@ -33,7 +33,7 @@ defmodule Dune.Opts do
     Limits the time the evaluation process is authorized to run (in milliseconds).
     This does not include the `parse_timeout`.
     Should be an integer `>= 0` or `:infinity`. Defaults to `50`.
-    - `parse_timeout`:
+  - `parse_timeout`:
     Limits the maximal amount of time spent parsing a string to safe AST (in milliseconds).
     This comes in addition to `timeout`.
     Should be an integer `>= 0` or `:infinity`. Defaults to the value of `timeout`.
